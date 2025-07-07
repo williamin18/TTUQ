@@ -1,0 +1,23 @@
+n = 4;
+d = 10;
+N = n*ones(d,1);
+r = 3;
+
+x = TTrand(N,r);
+U = TTorthogonalizeLR(x);
+x = TTrand(N,r);
+
+V{d} = U{d};
+Ux{d} = U{d};
+for i = d:-1:2
+    [Q, R] = qr(v2h(V{i}, n)', 'econ');
+    V{i} = h2v(Q', n);
+    V{i-1} = U{i-1} * R';
+    Ux{i-1} = V{i-1};
+end
+
+Ux4 = TT_Riemannian_Gauge_update(U,V,Ux);
+
+Ux2 = TT_Riemannian_projection(U,V,x);
+x2 = TT_Riemannian_fromGTensor(U,V,Ux2);
+err = TTnorm(TTaxby(1,x,-1,x2))/TTnorm(x);
