@@ -38,7 +38,7 @@ for epoch = 1:max_iterations
     norm(r)
     
     %Compute Newton updates for each core
-    [V,dUx] = TT_Newton_Gradient(A_linear,x,r,\beta,dx_TT,lambda);
+    [V,dUx] = TT_Newton_Gradient(A_linear,x,r,beta,dx_TT,lambda);
     %Update x by TT-structure update
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     beta = 1;

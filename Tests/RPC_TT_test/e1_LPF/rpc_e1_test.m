@@ -5,7 +5,7 @@ load('Tests/RPC_TT_test/e1_LPF/rpc_e1_samples.mat')
 m = 3;
 x_train = training_samples2(1:3000,:);
 y_train = vouts_train2(1:3000,:);
-y_predict = rpc_total(x_train,y_train(:,100),test_samples,3,'Hermite');
+[y_predict,n_rpc,d_rpc] = rpc_total(x_train,y_train(:,100),test_samples,3,'Hermite');
 
 norm(y_predict-vouts_test(:,100))/norm(vouts_test(:,100))
 

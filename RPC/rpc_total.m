@@ -1,4 +1,4 @@
-function [y_out,n_rpc,d_rpc,n_ierations] = rpc_total(x_train,y_train,x_out,order,polynomial)
+function [y_out,n_rpc,d_rpc,n_iterations] = rpc_total(x_train,y_train,x_out,order,polynomial)
 switch polynomial
     case "Hermite"
         f = @genHermite;
@@ -25,13 +25,12 @@ for i = 1:n_train
     end
 end
 Phi = sample_polynomial_mat;
-Psi = sample_polynomial_mat(:,2:end);
 
 n_rpc = zeros(n_total,n_y);
-d_rpc = zeros(n_total-1,n_y);
-n_ierations = zeros(n_y,1);
+d_rpc = zeros(n_total,n_y);
+n_iterations = zeros(n_y,1);
 for i = 1:n_y
-    [n_rpc(:,i),d_rpc(:,i),n_ierations(i)] = sk_solve(Phi,Psi,y_train(:,i),5e-3,100);
+    [n_rpc(:,i),d_rpc(:,i),n_iterations(i)] = sk_solve(Phi,y_train(:,i),5e-3,100);
 end
 
 
@@ -49,6 +48,6 @@ for i = 1:n_samples
             end
         end
     end
-    y_out(i,:) = (h'*n_rpc)./(1+h(2:end)'*d_rpc);
+    y_out(i,:) = (h'*n_rpc)./(h'*d_rpc);
 end
 end

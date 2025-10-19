@@ -1,25 +1,25 @@
-function [a_n,a_d,n_iterations,rel_err] = sk_solve2(Phi,y,tol,max_iterations)
+function [a_n,a_d,n_iterations,rel_err] = sk_solve3(Phi,Psi,y,tol,max_iterations)
 
 rel_err = 1;
 break_counter = 0;
 break_limit = 5;
 
 [n_samples,n_n] = size(Phi);
+[n_samples,n_d] = size(Psi);
 lambda = ones(n_samples,1);
 
 
 for i = 1:max_iterations
 
-    b = [zeros(n_samples,1);1];
-    
-    A = [Phi.*lambda, -Phi.*y.*lambda; [zeros(1,n_n) 1  zeros(1,n_n-1)]];
+    b = lambda.*y;
+    A = [repmat(lambda,1,n_n).*Phi, -repmat(b,1,n_d).*Psi];
     x = A\b;
     
     a_n = x(1:n_n,:);
     a_d = x(n_n+1:end,:);
     
     rel_err_old = rel_err;
-    rel_err = norm((Phi*a_n)./(Phi*a_d)-y)/norm(y);
+    rel_err = norm((Phi*a_n)./(1+Psi*a_d)-y)/norm(y);
     
     
     if rel_err<tol 
@@ -35,7 +35,7 @@ for i = 1:max_iterations
         break_counter = 0;
     end
 
-    lambda = 1./(Phi*a_d);
+    lambda = 1./(1+Psi*a_d);
 end
 n_iterations = i;
 
