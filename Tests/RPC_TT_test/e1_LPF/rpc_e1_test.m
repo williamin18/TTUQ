@@ -16,7 +16,7 @@ x = TTorthogonalizeLR(x);
 x{d} = x{d}/norm( x{d},'fro');
 
 [y_predict2,RPC_coefficients,n_iterations] = rpc_TT(xi_train,y_train(:,100),x,test_samples,m,'Hermite',...
-    0.3,0.1,1e-3,0.9,4);
+    0.4,0.1,1e-3,0.9,4);
 
 
 f = figure(5);
