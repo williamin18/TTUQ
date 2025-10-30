@@ -45,7 +45,7 @@ for i = 1:n_y
     x_n{d} = x_n{d}*x{d+1}(1:tt_ranks(d+1));
     x_d = x(1:d);
     x_d{d} = x_d{d}*x{d+1}(tt_ranks(d+1)+1:2*tt_ranks(d+1));
-    y_predict(:,i) = multi_r1_times_TT(predict_samples,x_n)./multi_r1_times_TT(predict_samples,x_d);
+    y_predict(:,i) = multi_r1_times_TT(test_samples,x_n)./multi_r1_times_TT(test_samples,x_d);
 end
 
 end
