@@ -13,6 +13,9 @@ y_train = vouts_train2(1:1000,:);
 N = [(m+1)*ones(d,1); 2];
 x = TTrand(N,2);
 x = TTorthogonalizeLR(x);
+for i = 2:d
+    x{i}(3:end,:) = 0;
+end
 x{d} = x{d}/norm( x{d},'fro');
 
 [y_predict2,RPC_coefficients,n_iterations] = rpc_TT(xi_train,y_train(:,100),x,test_samples,m,'Hermite',...
