@@ -1,7 +1,7 @@
 function [y_predict,RPC_coefficients,n_iterations] = rpc_TT(xi_train,y_train,x,xi_test,order,polynomial,...
     preprocessing_parameter,regularization_parameter,tol,training_proportion,r_max)
 
-max_iterations = 100;
+max_iterations = 300;
 
 lambda1 = preprocessing_parameter;
 lambda2 = regularization_parameter;
@@ -32,7 +32,10 @@ training_err = zeros(n_y,1);
 test_err = zeros(n_y,1);
 n_iterations = zeros(n_y,1);
 for i = 1:n_y
-    [x,training_err(i),test_err(i),n_iterations(i)] = TT_RPC_ALS(training_samples,x,training_out(:,i),r_max,tol,max_iterations,vali_samples,vali_out,lambda2);
+    % [x,training_err(i),test_err(i),n_iterations(i)] = TT_RPC_ALS(training_samples,x,training_out(:,i),r_max,tol,max_iterations,vali_samples,vali_out,lambda2);
+    [x,training_err(i),test_err(i),n_iterations(i)] = TT_Newton_rational4(training_samples,x,training_out(:,i),r_max,tol,max_iterations,vali_samples,vali_out,lambda2);
+    % [x,training_err(i),test_err(i),n_iterations(i)] = TT_Newton_rational5(training_samples,x,training_out(:,i),r_max,tol,max_iterations,vali_samples,vali_out,lambda2);
+
     RPC_coefficients{i} = x;
 end
 

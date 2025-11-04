@@ -35,7 +35,7 @@ for epoch = 1:max_iterations
     % rho = rho/max(abs(rho));
     % A_linear{d+1}(1:n_samples,:) = [rho -rho.*b];
     r = b_linear - multi_r1_times_TT(A_linear,x);
-    norm(r)
+    test_r1 =  norm(r);
     
     %Compute Newton updates for each core
     [V,dUx] = TT_Newton_Gradient(A_linear,x,r,beta,dx_TT,lambda);
@@ -44,7 +44,8 @@ for epoch = 1:max_iterations
     beta = 1;
     x = TT_Riemannian_update(x,V,dUx,1,rank);
 
-    
+    [test_r1 norm(b_linear - multi_r1_times_TT(A_linear,x))]
+
     x_n = x(1:d);
     x_n{d} = x_n{d}*x{d+1}(1:tt_ranks(d+1));
     x_d = x(1:d);
