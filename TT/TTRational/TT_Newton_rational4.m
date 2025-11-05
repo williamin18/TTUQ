@@ -43,6 +43,7 @@ for epoch = 1:max_iterations
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     beta = 1;
     x = TT_Riemannian_update(x,V,dUx,1,rank);
+    lambda = lambda*0.8;
 
     [test_r1 norm(b_linear - multi_r1_times_TT(A_linear,x))]
 

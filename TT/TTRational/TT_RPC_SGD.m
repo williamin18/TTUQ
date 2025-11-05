@@ -1,4 +1,4 @@
-function [x,training_err,test_err,epoch] = TT_RPC_ALS(A,x,b,rank,tol,max_iterations,A_test,b_test,lambda)
+function [x,training_err,test_err,epoch] = TT_RPC_SGD(A,x,b,rank,tol,max_iterations,A_test,b_test,lambda)
 %find x_n and x_d that minimizes || (A*x_1)./(1+A*x_2)-b||, x = [x1; x2]
 
 
@@ -36,18 +36,26 @@ dx_TT = 0;
 
 batch_size = 20;
 max_epoch = 10;
-for i = 1:max_epoch
+for epoch = 1:max_epoch
+
     new_order = randperm(n_samples);
     for i = 1:d
         A{i} = A{i}(new_order,:);
     end
     b = b(new_order);
+
     for j = 1:batch_size:n_samples-batch_size+1
-        A_j = cell(d,1);
-        for i = 1:d+1
-            A_j{i} = A_linear{i}(j:j+batch_size-1,:);
+        A_j = cell(d+1,1);
+        for i = 1:d
+            A_j{i} = A{i}(j:j+batch_size-1,:);
+            A_j{i}(batch_size+1,:) = [1 zeros(1,m(i)-1)];
         end
         b_j = b(j:j+batch_size-1);
+        A_j{d+1} = [ones(n_samples,1) -b_j; 0 1];
+        bj_linear = [zeros(batch_size,1); 1];
+
+        r_j = bj_linear - multi_r1_times_TT(A_j,x);
+
     end
 end
 
