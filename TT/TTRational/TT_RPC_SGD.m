@@ -52,20 +52,21 @@ for epoch = 1:max_epoch
             A_j{i}(batch_size+1,:) = [1 zeros(1,m(i)-1)];
         end
         b_j = b2(j:j+batch_size-1);
-        A_j{d+1} = [ones(n_samples,1) -b_j; 0 1];
+        A_j{d+1} = [ones(batch_size,1) -b_j; 0 1];
         bj_linear = [zeros(batch_size,1); 1];
 
         r_j = bj_linear - multi_r1_times_TT(A_j,x);
         df = multi_r1_times_vec_to_TT(A_j,r_j);
-        Adf = multi_r1_times_TT(A2,df);
+        Adf = multi_r1_times_TT(A_linear,df);
 
         r = b_linear - multi_r1_times_TT(A_linear,x);
         step_size = Adf'*r/(Adf'*Adf);
 
         x = TTaxby(1,x,step_size,df);
-        x = TTrounding_Randomize_then_Orthogonalize(x,[1 r_round*ones(1,d-1) 1]);
+        x = TTrounding_Randomize_then_Orthogonalize(x,[1 rank*ones(1,d) 1]);
 
 
+        [~,~,tt_ranks] = TTsizes(x);
         x_n = x(1:d);
         x_n{d} = x_n{d}*x{d+1}(1:tt_ranks(d+1));
         x_d = x(1:d);
@@ -74,6 +75,10 @@ for epoch = 1:max_epoch
         r_test = b_test - multi_r1_times_TT(A_test,x_n)./multi_r1_times_TT(A_test,x_d);
         training_err = norm(r_train)/norm(b);
         test_err = norm(r_test)/norm(b_test);
+
+        rho = 1./(multi_r1_times_TT(A,x_d));
+        % rho = rho/max(abs(rho));
+        A_linear{d+1}(1:n_samples,:) = [rho -rho.*b];
     end
 end
 
