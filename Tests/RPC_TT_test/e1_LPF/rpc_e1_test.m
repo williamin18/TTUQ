@@ -18,7 +18,7 @@ x = TTorthogonalizeRL(x);
 
 
 [y_predict2,RPC_coefficients,n_iterations] = rpc_TT(xi_train,y_train(:,100),x,test_samples,m,'Hermite',...
-    0.3,0.1,1e-3,0.9,8);
+    0.3,0.2,1e-3,0.9,8);
 
 norm(y_predict2-vouts_test(:,100))/norm(vouts_test(:,100))
 

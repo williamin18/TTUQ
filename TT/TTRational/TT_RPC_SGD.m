@@ -17,8 +17,8 @@ A_linear = [A;{[ones(n_samples,1) -b]}];
 for i = 1:d
     A_linear{i}(n_samples+1,:) = [1 zeros(1,m(i)-1)];
 end
-A_linear{d+1}(n_samples+1,:) = [0 1];
-b_linear = [zeros(n_samples,1);1];
+A_linear{d+1}(n_samples+1,:) = [0 10];
+b_linear = [zeros(n_samples,1);10];
 
 
 [n_test_samples,~] = size(A_test{1});
@@ -59,7 +59,8 @@ for epoch = 1:max_epoch
         df = multi_r1_times_vec_to_TT(A_j,r_j);
         Adf = multi_r1_times_TT(A_linear,df);
 
-        r = b_linear - multi_r1_times_TT(A_linear,x);
+        Ax = multi_r1_times_TT(A_linear,x);
+        r = b_linear - Ax;
         step_size = Adf'*r/(Adf'*Adf);
 
         x = TTaxby(1,x,step_size,df);

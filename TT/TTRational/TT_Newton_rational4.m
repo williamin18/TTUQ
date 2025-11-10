@@ -17,8 +17,8 @@ A_linear = [A;{[ones(n_samples,1) -b]}];
 for i = 1:d
     A_linear{i}(n_samples+1,:) = [1 zeros(1,m(i)-1)];
 end
-A_linear{d+1}(n_samples+1,:) = [0 1];
-b_linear = [zeros(n_samples,1);1];
+A_linear{d+1}(n_samples+1,:) = [0 100];
+b_linear = [zeros(n_samples,1);100];
 
 
 beta = 0;
@@ -38,12 +38,12 @@ for epoch = 1:max_iterations
     test_r1 =  norm(r);
     
     %Compute Newton updates for each core
-    [V,dUx] = TT_Newton_Gradient(A_linear,x,r,beta,dx_TT,lambda);
+    [V,dUx] = TT_Newton_Gradient2(A_linear,x,r,beta,dx_TT,lambda);
     %Update x by TT-structure update
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     beta = 1;
     x = TT_Riemannian_update(x,V,dUx,1,rank);
-    lambda = lambda*0.8;
+    lambda = lambda*0.9;
 
     [test_r1 norm(b_linear - multi_r1_times_TT(A_linear,x))]
 
