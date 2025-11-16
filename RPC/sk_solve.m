@@ -10,9 +10,9 @@ lambda = ones(n_samples,1);
 
 for i = 1:max_iterations
 
-    b = [zeros(n_samples,1);1];
+    b = [zeros(n_samples,1);100];
     
-    A = [Phi.*lambda, -Phi.*y.*lambda; [zeros(1,n_n) 1  zeros(1,n_n-1)]];
+    A = [Phi.*lambda, -Phi.*y.*lambda; [zeros(1,n_n) 100  zeros(1,n_n-1)]];
     x = A\b;
     
     a_n = x(1:n_n,:);
