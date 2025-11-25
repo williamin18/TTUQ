@@ -1,18 +1,21 @@
-function [a_n,a_d,n_iterations,rel_err] = sk_solve(Phi,y,tol,max_iterations)
+function [a_n,a_d,n_iterations,rel_err] = sk_solve(Phi,y,tol,max_iterations,regularizaion_parameter)
 
 rel_err = 1;
 break_counter = 0;
 break_limit = 5;
 
 [n_samples,n_n] = size(Phi);
-lambda = ones(n_samples,1);
-
+gamma = ones(n_samples,1);
+lambda = regularizaion_parameter;
 
 for i = 1:max_iterations
-
-    b = [zeros(n_samples,1);100];
-    
-    A = [Phi.*lambda, -Phi.*y.*lambda; [zeros(1,n_n) 100  zeros(1,n_n-1)]];
+    if lambda ~= 0
+        b = [zeros(n_samples,1);100 ; zeros(2*n_n,1)];
+        A = [Phi.*gamma, -Phi.*y.*gamma; [zeros(1,n_n) 100  zeros(1,n_n-1)]; lambda*eye(2*n_n)];
+    else
+        b = [zeros(n_samples,1);100];    
+        A = [Phi.*gamma, -Phi.*y.*gamma; [zeros(1,n_n) 100  zeros(1,n_n-1)]];
+    end
     x = A\b;
     
     a_n = x(1:n_n,:);
@@ -35,7 +38,7 @@ for i = 1:max_iterations
         break_counter = 0;
     end
 
-    lambda = 1./(Phi*a_d);
+    gamma = 1./(Phi*a_d);
 end
 n_iterations = i;
 
