@@ -23,7 +23,13 @@ dUx = cell(d,1);
 
 %solve the seach directions
 for i = 1:d
-    dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual,lambda);
+    dUx{i} = zeros(r(i)*m(i),r(i+1));
+    for j = 1:m(i)
+        temp = residual.*reshape(A(i,j,:),n_samples,1);
+        temp = yr{i}.*repelem(temp,1,r(i+1));
+        dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';
+        % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
+    end
 end
 
 %solve A*dx for computating step sizes
