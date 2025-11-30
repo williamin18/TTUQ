@@ -38,14 +38,13 @@ for epoch = 1:max_iterations
     test_r1 =  norm(r);
     
     %Compute Newton updates for each core
-    [V,dUx] = TT_Newton_Gradient2(A_linear,x,r,beta,dx_TT,lambda);
+    [V,dUx] = TT_Newton_Gradient(A_linear,x,r,beta,dx_TT,lambda);
     %Update x by TT-structure update
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     beta = 1;
     x = TT_Riemannian_update(x,V,dUx,1,rank);
-    lambda = lambda*0.9;
 
-    [test_r1 norm(b_linear - multi_r1_times_TT(A_linear,x))]
+    % [test_r1 norm(b_linear - multi_r1_times_TT(A_linear,x))]
 
     x_n = x(1:d);
     x_n{d} = x_n{d}*x{d+1}(1:tt_ranks(d+1));
@@ -56,6 +55,7 @@ for epoch = 1:max_iterations
     training_err = norm(r_train)/norm(b);
     test_err = norm(r_test)/norm(b_test);
 
+    [test_r1 training_err test_err]
     if test_err < tol 
         break
     end
