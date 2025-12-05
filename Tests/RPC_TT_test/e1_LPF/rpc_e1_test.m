@@ -1,12 +1,12 @@
 clear variables
-load('Tests/RPC_TT_test/e1_LPF/rpc_e1_samples.mat')
+load('Tests/RPC_TT_test/e1_LPF/rpc_e1_samples_d21.mat')
 
 [~,n_fpoint] = size(vouts_train2);
 m = 1;
 xi_train = training_samples1(1:1000,:);
 y_train = vouts_train1(1:1000,:);
 
-% [y_predict2,n_rpc,d_rpc] = rpc_total(xi_train,y_train(:,100),test_samples,3,'Hermite',1,0,5e-3);
+% [y_predict2,n_rpc,d_rpc] = rpc_total(xi_train,y_train(:,100),test_samples,2,'Hermite',0.3,0.1,5e-3);
 % norm(y_predict2-vouts_test(:,100))/norm(vouts_test(:,100))
 
 [~,d] = size(xi_train);
