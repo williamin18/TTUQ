@@ -43,6 +43,7 @@ for epoch = 1:max_iterations
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     beta = 1;
     x = TT_Riemannian_update(x,V,dUx,1,rank);
+    [~,~,tt_ranks] = TTsizes(x);
 
     % [test_r1 norm(b_linear - multi_r1_times_TT(A_linear,x))]
 
@@ -55,7 +56,7 @@ for epoch = 1:max_iterations
     training_err = norm(r_train)/norm(b);
     test_err = norm(r_test)/norm(b_test);
 
-    [test_r1 training_err test_err]
+    [test_r1 training_err test_err];
     if test_err < tol 
         break
     end
