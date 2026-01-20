@@ -3,14 +3,14 @@ d = 10;
 N = n*ones(d,1);
 r = 3;
 
-n_samples = 2000;
+n_samples = 4000;
 n_test_samples = 200;
 
-X_true = TTrand(N,r);
+X_true = TTrand([N ;2],r);
 
 X_true = TTorthogonalizeRL(X_true);
 X_true = TTorthogonalizeLR(X_true);
-
+X_true{d+1} = X_true{d+1}/norm( X_true{d+1},'fro')*100;
 
 [~,N,r] = TTsizes(X_true);
 d1 = TT_eval(X_true,[ones(1,d) 2]);

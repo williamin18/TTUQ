@@ -1,4 +1,4 @@
-function [x,training_err,test_err,epoch] = TT_Newton_rational4(A,x,b,rank,tol,max_iterations,A_test,b_test,lambda)
+function [x,y,training_err,test_err,epoch] = TT_Newton_rational6(A,x,b,y,rank,tol,max_iterations,A_test,b_test,lambda)
 %find x_n and x_d that minimizes || (A*x_1)./(1+A*x_2)-b||, x = [x1; x2]
 
 
@@ -13,14 +13,17 @@ d = length(A);
 [n_samples,~] = size(A{1});
 [~,m,~] = TTsizes(x);
 
-A_linear = [A;{[ones(n_samples,1) -b]}];
+C = zeros(n_samples,d);
 for i = 1:d
-    A_linear{i}(n_samples+1,:) = [1 zeros(1,m(i)-1)];
+    C(:,i) = A{i}(:,2);
 end
-A_linear{d+1}(n_samples+1,:) = [0 100];
-b_linear = [zeros(n_samples,1);100];
+Cb = C.*b;
 
-
+[n_test_samples,~] = size(A_test{1});
+C_test = zeros(n_test_samples,1);
+for i = 1:d
+    C_test(:,i) = A_test{i}(:,2);
+end
 beta = 0;
 dx_TT = 0;
 
@@ -28,31 +31,21 @@ for epoch = 1:max_iterations
 
     
 
-    [~,~,tt_ranks] = TTsizes(x);
-    % x_d = x(1:d);
-    % x_d{d} = x_d{d}*x{d+1}(tt_ranks(d+1)+1:2*tt_ranks(d+1));
-    % rho = 1./(multi_r1_times_TT(A,x_d));
-    % rho = rho/max(abs(rho));
-    % A_linear{d+1}(1:n_samples,:) = [rho -rho.*b];
-    r = b_linear - multi_r1_times_TT(A_linear,x);
+
+    r = b_linear - multi_r1_times_TT(A_linear,x) + Cb*y;
     test_r1 =  norm(r);
     
     %Compute Newton updates for each core
-    [V,dUx] = TT_Newton_Gradient(A_linear,x,r,beta,dx_TT,lambda);
+    [V,dUx,y] = TT_Newton_Gradient_rational(A,Cb,x,y,r,beta,dx_TT,lambda);
     %Update x by TT-structure update
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     beta = 1;
     x = TT_Riemannian_update(x,V,dUx,1,rank);
-    [~,~,tt_ranks] = TTsizes(x);
 
     % [test_r1 norm(b_linear - multi_r1_times_TT(A_linear,x))]
 
-    x_n = x(1:d);
-    x_n{d} = x_n{d}*x{d+1}(1:tt_ranks(d+1));
-    x_d = x(1:d);
-    x_d{d} = x_d{d}*x{d+1}(tt_ranks(d+1)+1:2*tt_ranks(d+1));
-    r_train = b - multi_r1_times_TT(A,x_n)./multi_r1_times_TT(A,x_d);
-    r_test = b_test - multi_r1_times_TT(A_test,x_n)./multi_r1_times_TT(A_test,x_d);
+    r_train = b - multi_r1_times_TT(A,x)./(C*y);
+    r_test = b_test - multi_r1_times_TT(A_test,x)./(C_test*y);
     training_err = norm(r_train)/norm(b);
     test_err = norm(r_test)/norm(b_test);
 

@@ -1,4 +1,4 @@
-function [V,dUx,dy] = TT_Newton_Gradient_rational(A,Cb,U,y,residual,beta,dx_old,lambda)
+function [V,dUx,y] = TT_Newton_Gradient_rational(A,Cb,U,y,residual,beta,dx_old,lambda)
 % To solve (Ax)./(1+Cy) = b, we find Ax - (C.*b)y = b. Each iteration we
 % update x and y by solving dx - (C.*b)dy = r
 
@@ -74,6 +74,6 @@ else
     dy = alpha(2*d+1:3*d);
 
 end
-
+y = y + dy;
 end
 
