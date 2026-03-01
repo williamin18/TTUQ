@@ -26,13 +26,17 @@ for i = 1:d
 end
 beta = 0;
 dx_TT = 0;
-
+% 
+% A1 = A;
+% b1 = b;
 for epoch = 1:max_iterations
 
     
+    % rho = 1./(1+C*y);
+    % A1{1} = A{1}.*rho;
+    % b1 = b.*rho;
 
-
-    r = b_linear - multi_r1_times_TT(A_linear,x) + Cb*y;
+    r = b - multi_r1_times_TT(A,x) + Cb*y;
     test_r1 =  norm(r);
     
     %Compute Newton updates for each core
@@ -40,16 +44,25 @@ for epoch = 1:max_iterations
     %Update x by TT-structure update
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     beta = 1;
-    x = TT_Riemannian_update(x,V,dUx,1,rank);
 
-    % [test_r1 norm(b_linear - multi_r1_times_TT(A_linear,x))]
+    %
+    x2 = dx_TT;
+    [~,rank_d] = size(dx_TT{d-1}) ;
+    x2d = reshape(x2{d},rank_d,[]);
+    x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
+    x2{d} = reshape(x2d,[],1);
+    x = TT_rounding_ALS(A,x2,b+Cb*y,rank,lambda);
+    %
+    % x = TT_Riemannian_update(x,V,dUx,1,rank);
 
-    r_train = b - multi_r1_times_TT(A,x)./(C*y);
-    r_test = b_test - multi_r1_times_TT(A_test,x)./(C_test*y);
+    % [test_r1 norm(b - multi_r1_times_TT(A,x) + Cb*y)]
+
+    r_train = b - multi_r1_times_TT(A,x)./(1+C*y);
+    r_test = b_test - multi_r1_times_TT(A_test,x)./(1+C_test*y);
     training_err = norm(r_train)/norm(b);
     test_err = norm(r_test)/norm(b_test);
 
-    [test_r1 training_err test_err];
+    % [test_r1 training_err test_err]
     if test_err < tol 
         break
     end

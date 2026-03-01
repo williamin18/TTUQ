@@ -30,19 +30,20 @@ end
 %solve A*dx for computating step sizes
 Adx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r);
 
+lambda2 = 0.1*lambda;
 if beta <= 0
     %no momentum
-    Adx = [Adx Cb];
+    Adx = [Adx -Cb];
     %find Gram matrix with regularization
     reg_matrix = TTRegMatrix(dUx,U,V,lambda);
-    reg_matrix = [reg_matrix zeros(d,d);zeros(d,d) lambda^2*eye(d)];
+    reg_matrix = [reg_matrix zeros(d,d);zeros(d,d) lambda2^2*eye(d)];
 
     reg_vec = zeros(2*d,1);
     for i = 1:d
         reg_vec(i) = -lambda^2*sum(conj(dUx{i}).* Ux{i},"all");
-        reg_vec(i+d) = -lambda^2*y;
     end
-    
+    reg_vec(d+1:2*d) = -lambda2^2*y;
+
     %solve step sizes, update seach directions
     alpha = (Adx'*Adx+reg_matrix)\(Adx'*residual+reg_vec);
     for i = 1:d
@@ -53,18 +54,18 @@ else
     %with momentum, project the search directions from the previous iteration
     dU_old = TT_Riemannian_projection(U,V,dx_old);
     Adx_old = TTmuOrthogonalAx(A,dU_old,yl,yr,m,d,r);
-    Adx = [Adx Adx_old Cb];
+    Adx = [Adx Adx_old -Cb];
 
     %find Gram matrix with regularization
     reg_matrix = TTRegMatrix(dUx,U,V,lambda,dU_old);
-    reg_matrix = [reg_matrix zeros(2*d,d);zeros(d,2*d) lambda^2*eye(d)];
+    reg_matrix = [reg_matrix zeros(2*d,d);zeros(d,2*d) lambda2^2*eye(d)];
     reg_vec = zeros(3*d,1);
 
     for i = 1:d
         reg_vec(i) = -lambda^2*sum(conj(dUx{i}).* Ux{i},"all");
         reg_vec(i+d) = -lambda^2*sum(conj(dU_old{i}).* Ux{i},"all");
-        reg_vec(i+2*d) = -lambda^2*y;
     end
+    reg_vec(2*d+1:3*d) = -lambda2^2*y;
     %solve step sizes, update seach directions
     alpha = (Adx'*Adx+reg_matrix)\(Adx'*residual+reg_vec);
     for i = 1:d

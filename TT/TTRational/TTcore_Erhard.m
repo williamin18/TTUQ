@@ -1,0 +1,9 @@
+function [X] = TTcore_Erhard(Ai,xi,r1,m,r2,r_max)
+%TTCORE_E Summary of this function goes here
+%   Detailed explanation goes here
+    xi = reshape(permute(xi, [2 1 3]),m,[]);
+    Axi = A*xi;
+    ri = min(r_max,r2);
+    [U,S,V] = svd(Axi,'econ');
+    A2 = U(:)
+end
