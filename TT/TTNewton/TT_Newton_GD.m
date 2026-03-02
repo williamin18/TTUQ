@@ -28,7 +28,7 @@ for epoch = 1:max_iterations
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     x = TT_Riemannian_update(x,V,dUx,1,rank);
     r = b - multi_r1_times_TT(A,x);
-    beta = 0; %momentum starts after the first iteration
+    beta = 1; %momentum starts after the first iteration
 
     
     
