@@ -22,7 +22,7 @@ err_old = 100;
 for epoch = 1:max_iterations
 
     %Compute Newton updates for each core
-    [V,dUx] = TT_Newton_Gradient(A,x,r,beta,dx_TT,lambda);
+    [V,dUx] = TT_Newton_Gradient_NeglectD(A,x,r,beta,dx_TT,lambda);
     
     %Update x by TT-structure update
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
@@ -35,7 +35,7 @@ for epoch = 1:max_iterations
     x = TT_rounding_ALS(A,x2,b,rank,lambda);
 
     r = b - multi_r1_times_TT(A,x);
-    beta = 0; %momentum starts after the first iteration
+    beta = 1; %momentum starts after the first iteration
 
     
     
@@ -44,7 +44,7 @@ for epoch = 1:max_iterations
     r_test = multi_r1_times_TT(A_test,x) - b_test;
     test_err = norm(r_test)/norm(b_test);
 
-    if test_err < tol || test_err/training_err>4
+    if test_err < tol || test_err/training_err>6
         break
     end
 
