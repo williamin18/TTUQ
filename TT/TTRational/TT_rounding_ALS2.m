@@ -18,19 +18,21 @@ for i = 1:d-1
 
     
     %Use Erhard rounding
-    xi = reshape(x{i},[r(i), m(i), r(i+1)]);
-    xi = reshape(permute(xi, [2 1 3]),m(i),[]);
-    R = qr(A{i});
+    xi = v2i(xi,r(i));
+    R = qr(A{i},'econ');
     Rxi = R*xi;
-    Rxi = reshape(Rxi,[m(i),r(i),r(i+1)]);
-    Rxi = reshape(permute(Rxi, [2 1 3]),r(i)*m(i),[]);
+    Rxi = i2v(Rxi,r(i));
     [U,S,V] = svd(Rxi,'econ');
     r(i+1) = min(r(i+1),r_max);
     Rxi = U(:,1:r(i+1));
-    Rxi = reshape(permute(reshape(Rxi,[r(i), m(i), r(i+1)]), [2 1 3]),m(i),[]);
+    Rxi = v2i(Rxi,r(i));
     xi = R\Rxi;
-    Axi = A{i}*xi;
-    Axi = reshape(Axi,n_samples,r(i),r(i+1));
+    xi = i2v(xi,r(i));
+    [xi,R2] = qr(xi,'econ');
+    x{i} = xi;
+
+    Axi = A{i}*v2i(xi,r(i));
+    Axi = reshape(Axi,[n_samples,r(i),r(i+1)]);
     yl{i+1} = zeros(n_samples,r(i+1));
     for j = 1:r(i+1)
         yl{i+1}(:,j)  = sum(yl{i}.*Axi(:,:,j),2);

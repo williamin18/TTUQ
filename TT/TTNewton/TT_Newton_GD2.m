@@ -32,7 +32,7 @@ for epoch = 1:max_iterations
     x2d = reshape(x2{d},rank_d,[]);
     x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
     x2{d} = reshape(x2d,[],1);
-    x = TT_rounding_ALS(A,x2,b,rank,lambda);
+    x = TT_rounding_ALS2(A,x2,b,rank,lambda);
 
     r = b - multi_r1_times_TT(A,x);
     beta = 1; %momentum starts after the first iteration
