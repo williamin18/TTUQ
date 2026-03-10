@@ -5,8 +5,8 @@ function [yrk,yr] = Ax_right(A,x,k)
 [n_samples,~] = size(A{1});
 [d,m,r] = TTsizes(x);
 
-yl = cell(d-k+1,1);
-yr{d-k+1} = ones(n_samples,1);
+yl = cell(d,1);
+yr{d} = ones(n_samples,1);
 
 for i = d:-1:k+1
     xi = reshape(x{i},[r(i), m(i), r(i+1)]);
@@ -15,10 +15,10 @@ for i = d:-1:k+1
     Axi = reshape(Axi,n_samples,r(i+1),r(i));
     temp = zeros(n_samples,r(i));
     for j = 1:r(i)
-        temp(:,j) = sum(yr{i-k+1}.*Axi(:,:,j),2);
+        temp(:,j) = sum(yr{i}.*Axi(:,:,j),2);
     end
-    yr{i-k} = temp;
+    yr{i-1} = temp;
 end
-yrk = yr{1};
+yrk = yr{k};
 end
 

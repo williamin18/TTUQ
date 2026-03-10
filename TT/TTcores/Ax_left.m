@@ -2,10 +2,10 @@ function [ylk,yl] = Ax_left(A,x,k)
 %multiply rank 1 samples A with TT x for cores indices less than k, 
 % yl{k} is a n*r_k matrix: n is number of samples, r_k is the rank of k's TT-core
 [n_samples,~] = size(A{1});
-[~,m,r] = TTsizes(x);
+[d,m,r] = TTsizes(x);
 
 
-yl = cell(k,1);
+yl = cell(d,1);
 yl{1} = ones(n_samples,1);
 for i = 1:k-1
     xi = reshape(x{i},[r(i), m(i), r(i+1)]);
