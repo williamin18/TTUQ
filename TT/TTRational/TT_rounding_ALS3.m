@@ -3,9 +3,8 @@ function [x] = TT_rounding_ALS3(A,x,b,r_max,lambda)
 %   Detailed explanation goes here
 d = length(A);
 [n_samples,~] = size(A{1});
-[~,m,r] = TTsizes(x);
-
 x = TTorthogonalizeRL(x); 
+[~,m,r] = TTsizes(x);
 
 [~,yr] = Ax_right(A,x,1);      
 yl = cell(d,1);
@@ -15,37 +14,35 @@ for i = 1:d-1
 
 
     
-    % %Use Erhard rounding to approximate (i+1)-th TT-core
-    % Ay2 = zeros(n_samples,r(i+2),m(i+1));
-    % for j = 1:m(i+1)
-    %     Ay2(:,:,j) = yr{i+1}.*A{i+1}(:,j);
-    % end
-    % Ay2 = reshape(permute(Ay2,[3 2 1]),[m(i+1)*r(i+2) n_samples]);
-    % [~,R] = qr(Ay2','econ');
-    % 
-    % xi2 = v2h(x{i+1},m(i+1));
-    % yri = xi2*R';
-    % [~,~,V] = svd(yri);
-    % r(i+1) = min(r(i+1),r_max);
-    % V = V(1:r(i+1),:)/R;
+    %Use Erhard rounding to approximate (i+1)-th TT-core
+    Ay2 = zeros(n_samples,r(i+2),m(i+1));
+    for j = 1:m(i+1)
+        Ay2(:,:,j) = yr{i+1}.*A{i+1}(:,j);
+    end
+    Ay2 = reshape(permute(Ay2,[3 2 1]),[m(i+1)*r(i+2) n_samples]);
+    [~,R] = qr(Ay2','econ');
 
-    [U,S,V] = svd(yr{i});
+    xi2 = v2h(x{i+1},m(i+1));
+    yri = xi2*R';
+    [~,~,V] = svd(yri,'econ');
+    r(i+1) = min(r(i+1),r_max);
+    V = V(:,1:r(i+1))'/R;
+    [Q, ~] = qr(V', 'econ');
+    x2 = Q';
+    yri = (x2*Ay2).';
+    x{i} = TTcore_LS(yl{i},yri,A{i},b,lambda);
+    [x{i},~] = qr(x{i},'econ');
     
 
-    xi = v2i(x{i},r(i));
-    R = qr(A{i},'econ');
-    Rxi = R*xi;
-    Rxi = i2v(Rxi,r(i));
-    [U,S,V] = svd(Rxi,'econ');
-    r(i+1) = min(r(i+1),r_max);
-    Rxi = U(:,1:r(i+1));
-    Rxi = v2i(Rxi,r(i));
-    xi = R\Rxi;
-    xi = i2v(xi,r(i));
-    [xi,R2] = qr(xi,'econ');
-    x{i} = xi;
+    % [U,~,~] = svd(yr{i},'econ');
+    % r(i+1) = min(r(i+1),r_max);
+    % yri = U(:,1:r(i+1));
+    % x{i} = TTcore_LS(yl{i},yri,A{i},b,lambda);
+    % [x{i},~] = qr(x{i},'econ');
+    
 
-    Axi = A{i}*v2i(xi,r(i));
+
+    Axi = A{i}*v2i(x{i},r(i));
     Axi = reshape(Axi,[n_samples,r(i),r(i+1)]);
     yl{i+1} = zeros(n_samples,r(i+1));
     for j = 1:r(i+1)
