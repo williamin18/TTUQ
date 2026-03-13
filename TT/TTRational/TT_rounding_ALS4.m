@@ -13,6 +13,10 @@ yl{1} = ones(n_samples,1);
 
 for i = 1:d-1
 
+    [~,R] = qr(x{i},'econ');
+    xi2 = R*v2h(x{i+1},m(i+1));
+    [~,~,V] = svd
+
     [~,~,V] = svd(v2h(x{i+1},m(i+1)));
     r(i+1) = min(r(i+1),r_max);
     
