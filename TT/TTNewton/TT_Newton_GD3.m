@@ -1,4 +1,4 @@
-function [x,training_err,test_err,epoch] = TT_Newton_GD2(A,b,x,rank,tol,max_iterations,A_test,b_test,lambda)
+function [x,training_err,test_err,epoch] = TT_Newton_GD3(A,b,x,rank,tol,max_iterations,A_test,b_test,lambda)
 %x: unknown vector in TT-format
 %A: left hand side matrix, rows in rank-1 format
 %b: right hand side vector
@@ -33,7 +33,7 @@ for epoch = 1:max_iterations
     x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
     x2{d} = reshape(x2d,[],1);
 
-    x = TT_rounding_ALS3(A,x2,b,rank,lambda);
+    x = TT_rounding_ALS4(A,x2,b,rank,lambda);
 
     r = b - multi_r1_times_TT(A,x);
     beta = 1; %momentum starts after the first iteration
