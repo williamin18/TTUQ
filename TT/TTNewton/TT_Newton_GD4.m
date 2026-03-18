@@ -1,4 +1,4 @@
-function [x,training_err,test_err,epoch] = TT_Newton_GD3(A,b,x,rank,tol,max_iterations,A_test,b_test,lambda)
+function [x,training_err,test_err,epoch] = TT_Newton_GD4(A,b,x,rank,tol,max_iterations,A_test,b_test,lambda)
 %x: unknown vector in TT-format
 %A: left hand side matrix, rows in rank-1 format
 %b: right hand side vector
