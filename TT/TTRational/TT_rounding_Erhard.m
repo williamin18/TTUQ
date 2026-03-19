@@ -9,6 +9,7 @@ x = TTorthogonalizeRL(x);
 yl = cell(d,1);
 yl{1} = ones(n_samples,1);
 
+x1 = x;
 for i = 1:d-1
     Ayi = zeros(n_samples,r(i),m(i));
     for j = 1:m(i)
