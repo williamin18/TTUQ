@@ -51,8 +51,8 @@ for epoch = 1:max_iterations
     x2d = reshape(x2{d},rank_d,[]);
     x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
     x2{d} = reshape(x2d,[],1);
-    x = TT_rounding_Erhard(A,x2,rank);
-    % x =TT_rounding_ALS(A,x2,b+Cb*y,rank,lambda);
+    % x = TT_rounding_Erhard(A,x2,rank);
+    x =TT_rounding_ALS(A,x2,b+Cb*y,rank,lambda);
     % x =TT_rounding_ALS_RPC(A,x2,b,Cb,y,rank,lambda);
 
 
