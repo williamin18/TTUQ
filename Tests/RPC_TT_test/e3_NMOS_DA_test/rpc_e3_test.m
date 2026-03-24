@@ -8,7 +8,7 @@ y_train = vouts_train(1:1000,:);
 y_test = vouts_test;
 
 m=2;
-
+f_k = 1:100;
 
 tic
 [y_predict,n_rpc,d_rpc] = rpc_total(xi_train,y_train,test_samples,m,'Hermite',0.5,0.01,1e-3);
@@ -16,22 +16,37 @@ toc
 norm(y_predict-vouts_test)/norm(vouts_test)
 
 
-% [y_predict2] = pc_collocation_total(xi_train,y_train(:,f_k),test_samples,m,'Hermite');
+% [y_predict2] = pc_collocation_total(xi_train,y_train(:,f_k),test_samples,3,'Hermite');
 % norm(y_predict2-vouts_test(:,f_k))/norm(vouts_test(:,f_k))
 
-m = 2;
-[~,d] = size(xi_train);
-N = [(m+1)*ones(d,1); 2];
-x = TTrand(N,3);
-x = TTorthogonalizeLR(x);
-x{d+1} = x{d+1}/norm( x{d+1},'fro');
-x = TTorthogonalizeRL(x);
+m = 3;
+N = (m+1)*ones(d,1);
+r = 3;
+x = TTrand(N,r);
+x{1}(1,:) = [1 zeros(1,r-1)];
+for i = 1:d-1
+    x{i}(1:r,:)=eye(r);
+end
 
 tic
-[y_predict2,RPC_coefficients,n_iterations] = rpc_TT(xi_train,y_train,x,test_samples,m,'Hermite',...
-    0.3,0.01,5e-3,0.9,3);
+ [y_predict2,PC_coefficients,training_err,test_err,n_iterations] = pc_collocation_tensor_optimization...
+     (xi_train,y_train,x,test_samples,m,'Hermite','TT-Newton',0.3,0.1,5e-3,0.9,3,true);
 toc
 norm(y_predict2-vouts_test)/norm(vouts_test)
+% 
+% m = 2;
+% [~,d] = size(xi_train);
+% N = [(m+1)*ones(d,1); 2];
+% x = TTrand(N,3);
+% x = TTorthogonalizeLR(x);
+% x{d+1} = x{d+1}/norm( x{d+1},'fro');
+% x = TTorthogonalizeRL(x);
+% 
+% tic
+% [y_predict2,RPC_coefficients,n_iterations] = rpc_TT(xi_train,y_train,x,test_samples,m,'Hermite',...
+%     0.3,0.01,5e-3,0.9,3);
+% toc
+% norm(y_predict2-vouts_test)/norm(vouts_test)
 
 
 
