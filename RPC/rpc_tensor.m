@@ -23,7 +23,7 @@ n_rpc = zeros(n_tensor,n_y);
 d_rpc = zeros(n_tensor,n_y);
 n_iterations = zeros(n_y,1);
 for i = 1:n_y
-    [n_rpc(:,i),d_rpc(:,i),n_iterations(i)] = sk_solve(Phi,y_train(:,i),5e-3,20);
+    [n_rpc(:,i),d_rpc(:,i),n_iterations(i)] = sk_solve(Phi,y_train(:,i),5e-3,20,0);
 end
 
 

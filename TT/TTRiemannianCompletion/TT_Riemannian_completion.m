@@ -19,8 +19,11 @@ err_old = 100;
 
 for epoch = 1:max_epoches
 
+
     [V,dUx,dx_TT] = TT_Riemannian_completion_Gradient(A,x,r,beta,dx_TT);
     x = TT_Riemannian_update(x,V,dUx,1,rank);
+    
+    
 
     r = x_samples - multi_r1_times_TT(A,x);
     beta = 1;
