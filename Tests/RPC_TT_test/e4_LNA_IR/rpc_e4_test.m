@@ -11,7 +11,7 @@ f_k = 1:100;
 
 
 tic
-[y_predict,n_rpc,d_rpc] = rpc_total(xi_train,y_train(:,f_k),test_samples,m,'Hermite',0.3,0.05,5e-3);
+[y_predict,n_rpc,d_rpc] = rpc_total(xi_train,y_train(:,f_k),test_samples,m,'Hermite',0.3,0.01,5e-3);
 toc
 norm(y_predict-y_test(:,f_k),'fro')/norm(y_test(:,f_k),'fro')
 
