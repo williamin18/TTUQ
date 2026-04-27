@@ -1,4 +1,4 @@
-function [V,dUx,y] = TT_Newton_Gradient_rational(A,Cb,U,y,residual,beta,dx_old,lambda)
+function [V,dUx,y] = TT_Newton_Gradient_rational_neglectD(A,Cb,U,y,residual,beta,dx_old,lambda)
 % To solve (Ax)./(1+Cy) = b, we find Ax - (C.*b)y = b. Each iteration we
 % update x and y by solving dx - (C.*b)dy = r
 
@@ -18,14 +18,10 @@ function [V,dUx,y] = TT_Newton_Gradient_rational(A,Cb,U,y,residual,beta,dx_old,l
 dUx = cell(d,1);
 
 %solve the seach directions
-for i = 1:d
-    for j = 1:m(i)
-        temp = residual.*A{i}(:,j);
-        temp = yr{i}.*repelem(temp,1,r(i+1));
-        dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';        
-        % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
-    end
+for i = 1:d-1
+    dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual,lambda);
 end
+dUx{d} = Ux{d};
 
 %solve A*dx for computating step sizes
 Adx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r);

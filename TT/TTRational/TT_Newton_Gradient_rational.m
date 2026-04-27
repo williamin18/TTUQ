@@ -18,14 +18,21 @@ function [V,dUx,y] = TT_Newton_Gradient_rational(A,Cb,U,y,residual,beta,dx_old,l
 dUx = cell(d,1);
 
 %solve the seach directions
+% for i = 1:d
+%     for j = 1:m(i)
+%         temp = residual.*A{i}(:,j);
+%         temp = yr{i}.*repelem(temp,1,r(i+1));
+%         dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';        
+%         % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
+%     end
+% end
+
 for i = 1:d
-    for j = 1:m(i)
-        temp = residual.*A{i}(:,j);
-        temp = yr{i}.*repelem(temp,1,r(i+1));
-        dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';        
-        % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
-    end
+    dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual,lambda);
 end
+
+
+
 
 %solve A*dx for computating step sizes
 Adx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r);

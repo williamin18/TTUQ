@@ -27,6 +27,17 @@ for i = 1:d-1
 end
 dUx{d} = Ux{d};
 
+% for i = 1:d
+%     for j = 1:m(i)
+%         temp = residual.*A{i}(:,j);
+%         temp = yr{i}.*repelem(temp,1,r(i+1));
+%         dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';        
+%         % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
+%     end
+% end
+
+
+
 %solve A*dx for computating step sizes
 Adx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r);
 
