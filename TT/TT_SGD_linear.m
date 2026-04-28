@@ -1,6 +1,6 @@
 function [x_min,training_err,test_err,n_iterations] = TT_SGD_linear(A,b,x,r_round,tol,max_epoches,A_test,b_test,lambda,batch_size)
-%stupid method, implementd when I did not understand tensor train well, not
-%suggested
+%stupid method, implemented when I did not understand tensor train well, not
+%recommended
 d = length(A);
 [n_samples,~] = size(A{1});
 [n_test_samples,~] = size(A_test{1});
