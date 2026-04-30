@@ -5,7 +5,7 @@ function [V,dUx,y] = TT_Newton_Gradient_rational2(A,C,U,y,residual,beta,dx_old,l
 [d,m,r] = TTsizes(U);
 
 
-%Right Orthogonalize, find every non-orthogal Ux to compute the seach
+%Right Orthogonalize, find every non-orthogonal Ux to compute the search
 %directions dUx
 [Ux,V] = TTmuOrthogonalizeRL(U);
 
@@ -17,7 +17,11 @@ function [V,dUx,y] = TT_Newton_Gradient_rational2(A,C,U,y,residual,beta,dx_old,l
 
 dUx = cell(d,1);
 
-%solve the seach directions
+%TODO
+Cy = 
+Ax = yl*yr
+
+%solve the search directions
 % for i = 1:d
 %     for j = 1:m(i)
 %         temp = residual.*A{i}(:,j);
@@ -28,14 +32,17 @@ dUx = cell(d,1);
 % end
 
 for i = 1:d
-    dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual,lambda);
+    dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual.*Cy,lambda);
 end
 
 
 
 
-%solve A*dx for computating step sizes
+%solve A*dx for computing step sizes
 Adx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r);
+%TODO: find change of f with dUxi, find chage of f with y
+Adx = Adx./Cy;
+
 
 lambda2 = 0.1*lambda;
 if beta <= 0
@@ -51,7 +58,7 @@ if beta <= 0
     end
     reg_vec(d+1:2*d) = -lambda2^2*y;
 
-    %solve step sizes, update seach directions
+    %solve step sizes, update search directions
     alpha = (Adx'*Adx+reg_matrix)\(Adx'*residual+reg_vec);
     for i = 1:d
         dUx{i} = alpha(i)*dUx{i};
