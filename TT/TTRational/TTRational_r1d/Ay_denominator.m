@@ -1,24 +1,18 @@
-function [Ady] = Ay_denominator(A,y,r)
+function [dfdy,Cy] = Ay_denominator(Ax,C,y)
 %AY_R1 undefined
 %   undefined
-    [n_samples,~] = size(A{1});
-    d = length(y);
+    [n_samples,d] = size(C);
 
-    yl = zeros(n_samples,d);
-    yr = zeros(n_samples,d);
 
-    yl(:,1) = ones(n_samples,1);
-    for i = 2:d
-        yl(:,i) = yl(:,i-1).*(A{i-1}(:,1) + A{i-1}(:,2)*y(i-1));
-    end
-    yr(:,d) = ones(n_samples,1);
-    for i = d-1:-1:1
-        yr(:,i) = (A{i+1}(:,1) + A{i+1}(:,2)*y(i+1)).*yr(:,i+1);
-    end
-
-    Ady = zeros(n_samples,d);
+    Cy = ones(n_samples,1);
     for i = 1:d
-        Ady(:,i) = yl(:,i).* A{i}(:,2).*yr(:,i);
+        Cy = Cy.*(1+C(:,i)*y(i));
     end
+
+   f = Ax./Cy;
+   dfdy = zeros(n_samples,d);
+   for i = 1:d
+        dfdy(:,i) = -f./(1+C(:,i)*y(i)).*C(:,i);
+   end
     
 end

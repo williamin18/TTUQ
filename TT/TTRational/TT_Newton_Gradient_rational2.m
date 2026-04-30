@@ -18,36 +18,38 @@ function [V,dUx,y] = TT_Newton_Gradient_rational2(A,C,U,y,residual,beta,dx_old,l
 dUx = cell(d,1);
 
 %TODO
-Cy = 
-Ax = yl*yr
+Cy = 1+C*y;
+Ax = sum((A{1}*Ux{1}).*yr{1},2);
 
 %solve the search directions
-% for i = 1:d
-%     for j = 1:m(i)
-%         temp = residual.*A{i}(:,j);
-%         temp = yr{i}.*repelem(temp,1,r(i+1));
-%         dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';        
-%         % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
-%     end
-% end
-
 for i = 1:d
-    dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual.*Cy,lambda);
+    for j = 1:m(i)
+        temp = residual.*A{i}(:,j);
+        temp = yr{i}.*repelem(temp,1,r(i+1));
+        dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';        
+        % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
+    end
 end
+
+% for i = 1:d
+%     dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual.*Cy,lambda);
+% end
 
 
 
 
 %solve A*dx for computing step sizes
-Adx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r);
+dfdx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r)./Cy;
 %TODO: find change of f with dUxi, find chage of f with y
-Adx = Adx./Cy;
-
+dfdy = zeros(n_samples,d);
+for i = 1:d
+    dfdy(:,i) = -Ax./(Cy.^2).*C(:,i);
+end
 
 lambda2 = 0.1*lambda;
 if beta <= 0
     %no momentum
-    Adx = [Adx -Cb];
+    dfdx = [dfdx dfdy];
     %find Gram matrix with regularization
     reg_matrix = TTRegMatrix(dUx,U,V,lambda);
     reg_matrix = [reg_matrix zeros(d,d);zeros(d,d) lambda2^2*eye(d)];
@@ -59,7 +61,7 @@ if beta <= 0
     reg_vec(d+1:2*d) = -lambda2^2*y;
 
     %solve step sizes, update search directions
-    alpha = (Adx'*Adx+reg_matrix)\(Adx'*residual+reg_vec);
+    alpha = (dfdx'*dfdx+reg_matrix)\(dfdx'*residual+reg_vec);
     for i = 1:d
         dUx{i} = alpha(i)*dUx{i};
     end
@@ -67,8 +69,8 @@ if beta <= 0
 else
     %with momentum, project the search directions from the previous iteration
     dU_old = TT_Riemannian_projection(U,V,dx_old);
-    Adx_old = TTmuOrthogonalAx(A,dU_old,yl,yr,m,d,r);
-    Adx = [Adx Adx_old -Cb];
+    Adx_old = TTmuOrthogonalAx(A,dU_old,yl,yr,m,d,r)./Cy;
+    dfdx = [dfdx Adx_old dfdy];
 
     %find Gram matrix with regularization
     reg_matrix = TTRegMatrix(dUx,U,V,lambda,dU_old);
@@ -81,11 +83,10 @@ else
     end
     reg_vec(2*d+1:3*d) = -lambda2^2*y;
     %solve step sizes, update seach directions
-    alpha = (Adx'*Adx+reg_matrix)\(Adx'*residual+reg_vec);
+    alpha = (dfdx'*dfdx+reg_matrix)\(dfdx'*residual+reg_vec);
     for i = 1:d
         dUx{i} = alpha(i)*dUx{i}+alpha(i+d)*dU_old{i};
     end
-    dUx{d} = dUx{d} + alpha(2*d+1)*Ux{d};
     dy = alpha(2*d+1:3*d);
 
 end

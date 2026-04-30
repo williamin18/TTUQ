@@ -78,7 +78,7 @@ else
     for i = 1:d
         dUx{i} = alpha(i)*dUx{i}+alpha(i+d)*dU_old{i};
     end
-    dUx{d} = dUx{d} + alpha(2*d+1)*Ux{d};
+    % dUx{d} = dUx{d} + alpha(2*d+1)*Ux{d};
     dy = alpha(2*d+1:3*d);
 
 end
