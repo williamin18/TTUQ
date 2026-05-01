@@ -59,8 +59,8 @@ for epoch = 1:max_iterations
     % x =TT_rounding_ALS_RPC(A,x2,b,Cb,y,rank,lambda);
 
 
-    r_train = b - multi_r1_times_TT(A,x)./(1+C*y);
-    r_test = b_test - multi_r1_times_TT(A_test,x)./(1+C_test*y);
+    r_train = b - multi_r1_times_TT(A,x)./Cy_r1(C,y);
+    r_test = b_test - multi_r1_times_TT(A_test,x)./Cy_r1(C_test,y);
     training_err = norm(r_train)/norm(b);
     test_err = norm(r_test)/norm(b_test);
 

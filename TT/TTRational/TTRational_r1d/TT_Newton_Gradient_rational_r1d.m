@@ -41,7 +41,7 @@ end
 %solve A*dx for computing step sizes
 dfdx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r)./Cy;
 
-lambda2 = 0.3*lambda;
+lambda2 = 0.1*lambda;
 if beta <= 0
     %no momentum
     dfdx = [dfdx dfdy];
