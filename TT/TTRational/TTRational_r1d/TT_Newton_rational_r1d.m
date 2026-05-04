@@ -46,16 +46,16 @@ for epoch = 1:max_iterations
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
     beta = 1;
 
-    x = TT_Riemannian_update(x,V,dUx,1,rank);
+    % x = TT_Riemannian_update(x,V,dUx,1,rank);
 
     %
-    % x2 = dx_TT;
-    % [~,rank_d] = size(dx_TT{d-1}) ;
-    % x2d = reshape(x2{d},rank_d,[]);
-    % x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
-    % x2{d} = reshape(x2d,[],1);
-    % % x = TT_rounding_Erhard(A,x2,rank);
-    % x =TT_rounding_ALS(A,x2,b+Cb*y,rank,lambda);
+    x2 = dx_TT;
+    [~,rank_d] = size(dx_TT{d-1}) ;
+    x2d = reshape(x2{d},rank_d,[]);
+    x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
+    x2{d} = reshape(x2d,[],1);
+    % x = TT_rounding_Erhard(A,x2,rank);
+    x =TT_rounding_ALS(A,x2,b.*Cy_r1(C,y),rank,lambda);
     % x =TT_rounding_ALS_RPC(A,x2,b,Cb,y,rank,lambda);
 
 
