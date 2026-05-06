@@ -1,4 +1,4 @@
-function [V,dUx,y] = TT_Newton_Gradient_rational_r1d(A,C,U,y,residual,beta,dx_old,lambda)
+function [V,dUx,y] = TT_Newton_Gradient_rational_r1d2(A,C,b,U,y,residual,beta,dx_old,lambda)
 % To solve (Ax)./(1+Cy) = b, we find Ax ./ C.y = b. Each iteration we
 % update x and y by solving dx*df/dx + dy*df/dy = r
 
@@ -19,29 +19,33 @@ dUx = cell(d,1);
 
 %TODO
 Ax = sum((A{1}*Ux{1}).*yr{1},2);
-[dfdy,Cy] = Ay_denominator(Ax,C,y);
 
-%solve the search directions
+[Cy] = Cy_r1(C,y).*b;
+dfdy = zeros(n_samples,d);
 for i = 1:d
-    for j = 1:m(i)
-        temp = residual.*A{i}(:,j);
-        temp = yr{i}.*repelem(temp,1,r(i+1));
-        dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';        
-        % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
-    end
+    dfdy(:,i) = -Cy./(1+C(:,i)*y(i)).*C(:,i);
 end
-
+%solve the search directions
 % for i = 1:d
-%     dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual.*Cy,lambda);
+%     for j = 1:m(i)
+%         temp = residual.*A{i}(:,j);
+%         temp = yr{i}.*repelem(temp,1,r(i+1));
+%         dUx{i}((j-1)*r(i)+1:j*r(i),:) = (temp'*yl{i})';        
+%         % dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yr{i}'* diag(residual.*reshape(A(i,j,:),n_samples,1))*yl{i})';
+%     end
 % end
+% 
+for i = 1:d
+    dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual.*Cy,lambda);
+end
 
 
 
 
 %solve A*dx for computing step sizes
-dfdx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r)./Cy;
+dfdx = TTmuOrthogonalAx(A,dUx,yl,yr,m,d,r);
 
-lambda2 = 0.1*lambda;
+lambda2 = 0.01*lambda;
 if beta <= 0
     %no momentum
     dfdx = [dfdx dfdy];
@@ -64,7 +68,7 @@ if beta <= 0
 else
     %with momentum, project the search directions from the previous iteration
     dU_old = TT_Riemannian_projection(U,V,dx_old);
-    Adx_old = TTmuOrthogonalAx(A,dU_old,yl,yr,m,d,r)./Cy;
+    Adx_old = TTmuOrthogonalAx(A,dU_old,yl,yr,m,d,r);
     dfdx = [dfdx Adx_old dfdy];
 
     %find Gram matrix with regularization
