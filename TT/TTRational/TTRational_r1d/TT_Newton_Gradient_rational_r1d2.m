@@ -1,4 +1,4 @@
-function [V,dUx,pred] = TT_Newton_Gradient_rational_r1d2(A,C,U,y,residual,beta,dx_old,lambda,damping)
+function [V,dUx,y,pred] = TT_Newton_Gradient_rational_r1d2(A,C,U,y,residual,beta,dx_old,lambda,damping)
 % To solve (Ax)./(1+Cy) = b, we find Ax ./ C.y = b. Each iteration we
 % update x and y by solving dx*df/dx + dy*df/dy = r
 
@@ -46,7 +46,7 @@ if beta <= 0
     %no momentum
     dfdx = [dfdx dfdy];
     %find Gram matrix with regularization
-    reg_matrix = TTRegMatrix(dUx,U,V,lambda);
+    reg_matrix = TTRegMatrix(dUx,U,V,lambda)+damping*eye(2*d);
     reg_matrix = [reg_matrix zeros(d,d);zeros(d,d) lambda2^2*eye(d)];
 
     reg_vec = zeros(2*d,1);
@@ -68,7 +68,7 @@ else
     dfdx = [dfdx Adx_old dfdy];
 
     %find Gram matrix with regularization
-    reg_matrix = TTRegMatrix(dUx,U,V,lambda,dU_old);
+    reg_matrix = TTRegMatrix(dUx,U,V,lambda,dU_old)+damping*eye(3*d);
     reg_matrix = [reg_matrix zeros(2*d,d);zeros(d,2*d) lambda2^2*eye(d)];
     reg_vec = zeros(3*d,1);
 
