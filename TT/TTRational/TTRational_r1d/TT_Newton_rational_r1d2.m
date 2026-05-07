@@ -30,6 +30,8 @@ dx_TT = 0;
 % 
 % A1 = A;
 % b1 = b;
+r = b - multi_r1_times_TT(A,x)./Cy_r1(C,y);
+damping = 0.001;
 for epoch = 1:max_iterations
 
     
@@ -37,29 +39,42 @@ for epoch = 1:max_iterations
     % A1{1} = A{1}.*rho;
     % b1 = b.*rho;
 
-    r = b - multi_r1_times_TT(A,x)./Cy_r1(C,y);
-    test_r1 =  norm(r);
-    
+    r_old = r;
     %Compute Newton updates for each core
-    [V,dUx,y] = TT_Newton_Gradient_rational_r1d(A,C,x,y,r,beta,dx_TT,lambda);
+    if epoch == 1
+        [V,dUx,y,pred,damping] = TT_Newton_Gradient_rational_r1d2(A,C,x,y,r,beta,dx_TT,lambda,damping);
+        beta = 1;
+        damping = 0.001*damping;
+    else
+        [V,dUx,y,pred] = TT_Newton_Gradient_rational_r1d2(A,C,x,y,r,beta,dx_TT,lambda,damping);
+    end
     %Update x by TT-structure update
     dx_TT = TT_Riemannian_fromGTensor(x,V,dUx);
-    beta = 1;
 
-    % x = TT_Riemannian_update(x,V,dUx,1,rank);
+    x = TT_Riemannian_update(x,V,dUx,1,rank);
 
     %
-    x2 = dx_TT;
-    [~,rank_d] = size(dx_TT{d-1}) ;
-    x2d = reshape(x2{d},rank_d,[]);
-    x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
-    x2{d} = reshape(x2d,[],1);
-    % x = TT_rounding_Erhard(A,x2,rank);
-    x =TT_rounding_ALS4(A,x2,b.*Cy_r1(C,y),rank,lambda);
+    % x2 = dx_TT;
+    % [~,rank_d] = size(dx_TT{d-1}) ;
+    % x2d = reshape(x2{d},rank_d,[]);
+    % x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
+    % x2{d} = reshape(x2d,[],1);
+    % % x = TT_rounding_Erhard(A,x2,rank);
+    % x =TT_rounding_ALS4(A,x2,b.*Cy_r1(C,y),rank,lambda);
     % x =TT_rounding_ALS_RPC(A,x2,b,Cb,y,rank,lambda);
 
 
-    r_train = b - multi_r1_times_TT(A,x)./Cy_r1(C,y);
+    r = b - multi_r1_times_TT(A,x)./Cy_r1(C,y);
+    ared = 0.5*(norm(r_old)-norm(r));
+    rho = ared/pred;
+    if rho > 0.75
+        damping = damping/2;
+    elseif rho < 0.25
+        damping = damping*10;
+    end
+    test_r1 =  norm(r);
+
+    r_train = r;
     r_test = b_test - multi_r1_times_TT(A_test,x)./Cy_r1(C_test,y);
     training_err = norm(r_train)/norm(b);
     test_err = norm(r_test)/norm(b_test);
