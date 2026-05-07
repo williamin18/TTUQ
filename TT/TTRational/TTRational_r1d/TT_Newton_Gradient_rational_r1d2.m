@@ -86,5 +86,6 @@ else
 
 end
 y = y + dy;
+pred = -(dfdx'*residual)'*alpha-0.5*alpha'*(dfdx'*dfdx+reg_matrix)*alpha;
 end
 
