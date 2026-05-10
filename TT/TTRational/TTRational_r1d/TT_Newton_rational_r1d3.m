@@ -56,8 +56,7 @@ for epoch = 1:max_iterations
     x2d(rank_d/2+1:end,:) = x2d(rank_d/2+1:end,:) + reshape(x{d},rank_d/2,[]);
     x2{d} = reshape(x2d,[],1);
     % x = TT_rounding_Erhard(A,x2,rank);
-    x =TT_rounding_ALS4(A,x2,b.*Cy_r1(C,y),rank,lambda);
-    % x =TT_rounding_ALS_RPC(A,x2,b,Cb,y,rank,lambda);
+    x =TT_rounding_ALS(A,x2,b.*Cy_r1(C,y),rank,lambda);
 
 
     r_train = b - multi_r1_times_TT(A,x)./Cy_r1(C,y);
