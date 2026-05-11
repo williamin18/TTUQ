@@ -30,6 +30,9 @@ dx_TT = 0;
 % 
 % A1 = A;
 % b1 = b;
+
+y = x;
+C = A;
 for epoch = 1:max_iterations
 
     
@@ -37,7 +40,8 @@ for epoch = 1:max_iterations
     % A1{1} = A{1}.*rho;
     % b1 = b.*rho;
     Ax = multi_r1_times_TT(A,x);
-    r = b - Ax./Cy_r1(C,y);
+    Cy = multi_r1_times_TT(C,y);
+    r = b - Ax./Cy;
     test_r1 =  norm(r);
     
     %Compute Newton updates for each core

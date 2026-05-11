@@ -7,13 +7,14 @@ function [V,dUx] = TT_Newton_Gradient(A,U,residual,beta,dx_old,lambda)
 %beta: if beta <= 0, no momentum
 %dx_old: the update at the previous iteration
 %lambda: regularization parameter, it is equal to sqrt(lambda)  in the paper
-[d,m,r] = TTsizes(U);
 
 
 %Right Orthogonalize, find every non-orthogal Ux to compute the seach
 %directions dUx
 [Ux,V] = TTmuOrthogonalizeRL(U);
 
+[d,m,r] = TTsizes(U);
+[n_samples,~] = size(A{1});
 
 
 [~,yl] = Ax_left(A,U,d);
@@ -24,6 +25,14 @@ dUx = cell(d,1);
 %solve the seach directions
 for i = 1:d
     dUx{i} = TTcore_Newton(yl{i},yr{i},A{i},Ux{i},residual,lambda);
+
+    % ni = r(i)*m(i)*r(i+1);
+    % Jxi = yl{i}.*permute(A{i},[1 3 2]).*permute(yr{i},[1 3 4 2]);
+    % Jxi = reshape(Jxi,n_samples,ni);
+    % Jxi = [Jxi;lambda*eye(ni)];
+    % resi = [residual; -lambda*reshape(Ux{i},[],1)];
+    % dUi = Jxi\resi;
+    % dUi = reshape(dUi,[r(i)*m(i) r(i+1)]);
 end
 
 % for i = 1:d
