@@ -1,4 +1,4 @@
-function [x,Ax] = TT_rounding_ALS4(A,x,b,r_max,lambda)
+function [y,Cy] = TT_rounding_ALS_denominator(Ax,C,y,b,r_max,lambda)
 %TT_ROUNDING_ALS3 Summary of this function goes here
 %   Detailed explanation goes here
 d = length(A);
