@@ -47,8 +47,8 @@ for epoch = 1:max_iterations
 
     % x = TT_Riemannian_update(x,V,dUx,1,rank);
 
-    [y, Cy] = TT_rounding_ALS4(C,y2,(Ax+Adx)./b-1,rank,lambda);
-    [x, Ax] = TT_rounding_ALS4(A,x2,b.*(1+Cy),rank,lambda);
+    [y, Cy] = TT_rounding_ALS(C,y2,(Ax+Adx)./b-1,rank,lambda);
+    [x, Ax] = TT_rounding_ALS(A,x2,b.*(1+Cy),rank,lambda);
 
 
     r = b - Ax./(1+Cy);

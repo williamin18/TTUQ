@@ -1,4 +1,4 @@
-function [x] = TT_rounding_ALS(A,x,b,r_max,lambda)
+function [x,Ax] = TT_rounding_ALS(A,x,b,r_max,lambda)
 %TT_ROUNDING_ALS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -34,4 +34,5 @@ for i = 1:d-1
  
 end
 x{d} = TTcore_LS(yl{d},yr{d},A{d},b,lambda);
+Ax = reshape(yl{d}.*permute(A{d},[1 3 2]),n_samples,[])*x{d};
 end
