@@ -26,7 +26,8 @@ for i = 1:d-1
     end
     Ay2 = reshape(permute(Ay2,[3 2 1]),[m(i+1)*r(i+2) n_samples]);
     yri = (v2h(y{i+1},m(i+1))*Ay2).';
-
+    
+    J = (yl{i}(-Ax./(Cy.^2)) ).*permute(A{i},[1 3 2]).*permute(yri{i},[1 3 4 2]);
 
     y{i} = TTcore_LS(yl{i},yri,C{i},b,lambda);
     [y{i},R] = qr(y{i},'econ');

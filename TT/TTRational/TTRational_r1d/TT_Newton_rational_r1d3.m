@@ -47,16 +47,19 @@ for epoch = 1:max_iterations
 
     % x = TT_Riemannian_update(x,V,dUx,1,rank);
 
-    [y, Cy] = TT_rounding_ALS(C,y2,(Ax+Adx)./b-1,rank,lambda);
-    [x, Ax] = TT_rounding_ALS(A,x2,b.*(1+Cy),rank,lambda);
+    x = TTrounding(x2,1e-5,rank);
+    y = TTrounding(y2,1e-5,rank);
+    % 
+    % [y, Cy] = TT_rounding_ALS(C,y2,(Ax+Adx)./b-1,rank,lambda);
+    % [x, Ax] = TT_rounding_ALS(A,x2,b.*(1+Cy),rank,lambda);
 
 
-    r = b - Ax./(1+Cy);
+    r = b - multi_r1_times_TT(A,x)./(1+multi_r1_times_TT(C,y));
     r_test = b_test - multi_r1_times_TT(A_test,x)./(1+multi_r1_times_TT(C_test,y));
     training_err = norm(r)/norm(b);
     test_err = norm(r_test)/norm(b_test);
 
-    % [test_r1 training_err test_err]
+    % [ training_err test_err]
     if test_err < tol 
         break
     end

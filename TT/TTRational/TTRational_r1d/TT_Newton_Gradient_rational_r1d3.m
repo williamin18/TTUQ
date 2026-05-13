@@ -39,7 +39,7 @@ for i = 1:d
     Jx{i} = reshape(Jxi,n_samples,ni);
     Jx_reg = [Jx{i} ;lambda*eye(ni)];
     res_reg = [residual; -lambda*reshape(Ux{i},[],1)];
-    dUi = Jx_reg'*res_reg;
+    dUi = Jx_reg\res_reg;
     dU{i} = reshape(dUi,[r(i)*m(i) r(i+1)]);
 
 
@@ -48,7 +48,7 @@ for i = 1:d
     Jy{i} = reshape(Jyi,n_samples,ni);
     Jy_reg = [Jy{i};lambda*eye(ni)];
     res_reg = [residual; -lambda*reshape(Yy{i},[],1)];
-    dYi = Jy_reg'*res_reg;
+    dYi = Jy_reg\res_reg;
     dY{i} = reshape(dYi,[r(i)*m(i) r(i+1)]);
 end
 
