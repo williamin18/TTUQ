@@ -1,37 +1,85 @@
-function [x,y,Ax,Cy] = TT_rounding_ALS_RPC(A,x,b,Cb,y,r_max,lambda)
+function [x,y,Ax,Cy] = TT_rounding_ALS_RPC(A,x,C,y,b,r_max,lambda)
 %TT_ROUNDING_ALS Summary of this function goes here
 %   Detailed explanation goes here
 
+x = TTorthogonalizeRL(x); 
+y = TTorthogonalizeRL(y); 
+
 d = length(A);
 [n_samples,~] = size(A{1});
-[~,m,r] = TTsizes(x);
+[d,m,r] = TTsizes(x);
+[~,my,ry] = TTsizes(y);
 
-x = TTorthogonalizeRL(x); 
+[~,axr] = Ax_right(A,x,1);
+[~,cyr] = Ax_right(C,y,1);
 
-[~,yr] = Ax_right(A,x,1);      
-yl = cell(d,1);
-yl{1} = ones(n_samples,1);
-lambda2 = 0.1*lambda;
+axl = cell(d,1);
+axl{1} = ones(n_samples,1);
+cyl = cell(d,1);
+cyl{1} = ones(n_samples,1);
+
+Ax = sum((A{1}*x{1}).*axr{1},2);
 
 for i = 1:d-1
-    xi = TTcore_LS_RPC(yl{i},yr{i},A{i},b,Cb,d,lambda,lambda2);
-    %use SVD rounding
+    ni = ry(i)*my(i)*ry(i+1);
+    Ci = cyl{i}.*permute(C{i},[1 3 2]).*permute(cyr{i},[1 3 4 2]);
+    Ci = reshape(Ci, n_samples,ni);
+    Cy = Ci*reshape(y{i},[],1);
+    residual = Ax./(1+Cy)-b;
+    
+    Jyi = (-Ax./(Cy.^2)).*Ci;
+    Jy_reg = [Jyi;lambda*eye(ni)];
+    res_reg = [residual; -lambda*reshape(y{i},[],1)];
+    dYi = Jy_reg\res_reg;
+    yi = y{i}+reshape(dYi,[ry(i)*my(i) ry(i+1)]);
+
+    
+    [U,S,V] = svd(yi,"econ");
+    ry(i+1) = min(ry(i+1),r_max);
+    y{i} = U(:,1:ry(i+1));
+
+    y{i+1} = h2v(S(1:ry(i+1),1:ry(i+1))*V(:,1:ry(i+1))'*v2h(y{i+1},my(i+1)),my(i+1));
+    cyl{i+1} = reshape(cyl{i}.*permute(C{i},[1 3 2]),n_samples,[])*y{i};
+
+end
+i = d;
+ni = ry(d)*my(i)*ry(i+1);
+Ci = cyl{i}.*permute(C{i},[1 3 2]).*permute(cyr{i},[1 3 4 2]);
+Ci = reshape(Ci, n_samples,ni);
+Cy = Ci*y{i};
+residual = Ax./(1+Cy)-b;
+
+Jyi = (-Ax./(Cy.^2)).*Ci;
+Jy_reg = [Jyi;lambda*eye(ni)];
+res_reg = [residual; -lambda*reshape(y{i},[],1)];
+dYi = Jy_reg\res_reg;
+y{d} = y{i}+dYi;
+
+Cy = 1+Ci*y{d};
+
+for i = 1:d-1
+    ni = r(i)*m(i)*r(i+1);
+    Jxi = (axl{i}./Cy ).*permute(A{i},[1 3 2]).*permute(axr{i},[1 3 4 2]);
+    Jxi = reshape(Jxi,n_samples,ni);
+    Jx_reg = [Jxi ;lambda*eye(ni)];
+    b_reg = [b; zeros(ni,1)];
+    xi = reshape(Jx_reg\b_reg,[r(i)*m(i) r(i+1)]);
+
+
     [U,~,~] = svd(xi,"econ");
     r(i+1) = min(r(i+1),r_max);
     x{i} = U(:,1:r(i+1));
-    %Use Erhard rounding
 
-    %-----------------------------------
-    xi = reshape(x{i},[r(i), m(i), r(i+1)]);
-    xi = reshape(permute(xi, [2 1 3]),m(i),[]);
-    Axi = A{i}*xi;
-    Axi = reshape(Axi,n_samples,r(i),r(i+1));
-
-    yl{i+1} = zeros(n_samples,r(i+1));
-    for j = 1:r(i+1)
-        yl{i+1}(:,j)  = sum(yl{i}.*Axi(:,:,j),2);
-    end
- 
+    axl{i+1} = reshape(axl{i}.*permute(A{i},[1 3 2]),n_samples,[])*x{i};
 end
-x{d} = TTcore_LS_RPC(yl{d},yr{d},A{d},b,Cb,d,lambda,lambda2);
+i = d;
+ni = r(i)*m(i)*r(i+1);
+Jxi = (axl{i}./Cy ).*permute(A{i},[1 3 2]).*permute(axr{i},[1 3 4 2]);
+Jxi = reshape(Jxi,n_samples,ni);
+Jx_reg = [Jxi ;lambda*eye(ni)];
+b_reg = [b; zeros(ni,1)];
+x{d} = Jx_reg\b_reg;
+
+Ax = Jxi*x{d}.*Cy;
+Cy = Cy-1;
 end

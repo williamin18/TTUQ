@@ -38,7 +38,7 @@ for i = 1:d
     Jxi = (axl{i}./Cy ).*permute(A{i},[1 3 2]).*permute(axr{i},[1 3 4 2]);
     Jx{i} = reshape(Jxi,n_samples,ni);
     Jx_reg = [Jx{i} ;lambda*eye(ni)];
-    res_reg = [residual; -lambda*reshape(Ux{i},[],1)];
+    res_reg = [residual; -lambda*reshape(Ux{i},ni,1)];
     dUi = Jx_reg'*res_reg;
     dU{i} = reshape(dUi,[r(i)*m(i) r(i+1)]);
 
@@ -47,7 +47,7 @@ for i = 1:d
     Jyi = (cyl{i}.*(-Ax./(Cy.^2)) ).*permute(C{i},[1 3 2]).*permute(cyr{i},[1 3 4 2]);
     Jy{i} = reshape(Jyi,n_samples,ni);
     Jy_reg = [Jy{i};lambda*eye(ni)];
-    res_reg = [residual; -lambda*reshape(Yy{i},[],1)];
+    res_reg = [residual; -lambda*reshape(Yy{i},ni,1)];
     dYi = Jy_reg'*res_reg;
     dY{i} = reshape(dYi,[r(i)*m(i) r(i+1)]);
 end

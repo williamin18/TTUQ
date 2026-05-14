@@ -46,7 +46,8 @@ for epoch = 1:max_iterations
     beta = 1;
 
     % x = TT_Riemannian_update(x,V,dUx,1,rank);
-
+    
+    % [x,y,Ax,Cy] = TT_rounding_ALS_RPC(A,x2,C,y2,b,rank,lambda);
     x = TTrounding(x2,1e-5,rank);
     y = TTrounding(y2,1e-5,rank);
     % 
@@ -54,7 +55,8 @@ for epoch = 1:max_iterations
     % [x, Ax] = TT_rounding_ALS(A,x2,b.*(1+Cy),rank,lambda);
 
 
-    r = b - multi_r1_times_TT(A,x)./(1+multi_r1_times_TT(C,y));
+    % r = b - Ax./(1+Cy);
+    r = b  - multi_r1_times_TT(A,x)./(1+multi_r1_times_TT(C,y));
     r_test = b_test - multi_r1_times_TT(A_test,x)./(1+multi_r1_times_TT(C_test,y));
     training_err = norm(r)/norm(b);
     test_err = norm(r_test)/norm(b_test);
