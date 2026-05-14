@@ -32,6 +32,7 @@ Cy = sum((C{1}*Yy{1}).*cyr{1},2)+1;
 
 Jx = cell(d,1);
 Jy = cell(d,1);
+lambda2 = 0.1*lambda;
 %solve the search directions
 for i = 1:d
     ni = r(i)*m(i)*r(i+1);
@@ -46,8 +47,8 @@ for i = 1:d
     ni = ry(i)*my(i)*ry(i+1);
     Jyi = (cyl{i}.*(-Ax./(Cy.^2)) ).*permute(C{i},[1 3 2]).*permute(cyr{i},[1 3 4 2]);
     Jy{i} = reshape(Jyi,n_samples,ni);
-    Jy_reg = [Jy{i};lambda*eye(ni)];
-    res_reg = [residual; -lambda*reshape(Yy{i},ni,1)];
+    Jy_reg = [Jy{i};lambda2*eye(ni)];
+    res_reg = [residual; -lambda2*reshape(Yy{i},ni,1)];
     dYi = Jy_reg'*res_reg;
     dY{i} = reshape(dYi,[r(i)*m(i) r(i+1)]);
 end
@@ -63,11 +64,11 @@ if beta <= 0
     %no momentum
     Ja = [dfdx dfdy];
     %find Gram matrix with regularization
-    reg_matrix = [TTRegMatrix(dU,U,V,lambda) zeros(d,d);zeros(d,d) TTRegMatrix(dY,Y,W,lambda)];
+    reg_matrix = [TTRegMatrix(dU,U,V,lambda) zeros(d,d);zeros(d,d) TTRegMatrix(dY,Y,W,lambda2)];
     reg_vec = zeros(2*d,1);
     for i = 1:d
         reg_vec(i) = -lambda^2*sum(conj(dU{i}).* Ux{i},"all");
-        reg_vec(d+i) = -lambda^2*sum(conj(dY{i}).* Yy{i},"all");
+        reg_vec(d+i) = -lambda2^2*sum(conj(dY{i}).* Yy{i},"all");
     end
 
     %solve step sizes, update search directions
@@ -95,14 +96,14 @@ else
     Ja = [dfdx dfdx2 dfdy dfdy2];
 
     %find Gram matrix with regularization
-    reg_matrix = [TTRegMatrix(dU,U,V,lambda,dU_old) zeros(2*d,2*d);zeros(2*d,2*d) TTRegMatrix(dY,Y,W,lambda,dY_old)];
+    reg_matrix = [TTRegMatrix(dU,U,V,lambda,dU_old) zeros(2*d,2*d);zeros(2*d,2*d) TTRegMatrix(dY,Y,W,lambda2,dY_old)];
     reg_vec = zeros(4*d,1);
 
     for i = 1:d
         reg_vec(i) = -lambda^2*sum(conj(dU{i}).* Ux{i},"all");
         reg_vec(d+i) = -lambda^2*sum(conj(dU_old{i}).* Ux{i},"all");
-        reg_vec(2*d+i) =  -lambda^2*sum(conj(dY{i}).* Yy{i},"all");
-        reg_vec(3*d+i) = -lambda^2*sum(conj(dY_old{i}).* Yy{i},"all");
+        reg_vec(2*d+i) =  -lambda2^2*sum(conj(dY{i}).* Yy{i},"all");
+        reg_vec(3*d+i) = -lambda2^2*sum(conj(dY_old{i}).* Yy{i},"all");
     end
     %solve step sizes, update search directions
     alpha = (Ja'*Ja+reg_matrix)\(Ja'*residual+reg_vec);
