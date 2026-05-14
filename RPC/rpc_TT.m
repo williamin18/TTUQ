@@ -33,11 +33,11 @@ D_coefficients = cell(n_y,1);
 training_err = zeros(n_y,1);
 test_err = zeros(n_y,1);
 n_iterations = zeros(n_y,1);
-% y = x;
-y = zeros(d,1);
+y = x;
+% y = zeros(d,1);
 for i = 1:n_y
-   % [x,y,training_err(i),test_err(i),n_iterations(i)]  = TT_Newton_rational_r1d3(training_samples,x,training_samples,y,training_out(:,i),r_max,tol,max_iterations,vali_samples,vali_samples,vali_out(:,i),lambda2);
-    [x,y,training_err(i),test_err(i),n_iterations(i)] = TT_Newton_rational_r1d(training_samples,x,training_out(:,i),y,r_max,tol,max_iterations,vali_samples,vali_out(:,i),lambda2);
+   [x,y,training_err(i),test_err(i),n_iterations(i)]  = TT_Newton_rational_r1d3(training_samples,x,training_samples,y,training_out(:,i),r_max,tol,max_iterations,vali_samples,vali_samples,vali_out(:,i),lambda2);
+    % [x,y,training_err(i),test_err(i),n_iterations(i)] = TT_Newton_rational_r1d(training_samples,x,training_out(:,i),y,r_max,tol,max_iterations,vali_samples,vali_out(:,i),lambda2);
     % [x,y,training_err(i),test_err(i),n_iterations(i)] = TT_Newton_rational8(training_samples,x,training_out(:,i),y,r_max,tol,max_iterations,vali_samples,vali_out(:,i),lambda2);
     disp([training_err(i) test_err(i) n_iterations(i)])
     N_coefficients{i} = x;
@@ -53,8 +53,8 @@ end
 for i = 1:n_y
     x = N_coefficients{i};
     y = D_coefficients{i};
-    % b_predict(:,i) = multi_r1_times_TT(test_samples,x)./(1+multi_r1_times_TT(test_samples,y));
-    b_predict(:,i) = multi_r1_times_TT(test_samples,x)./Cy_r1(C_test,y);
+    b_predict(:,i) = multi_r1_times_TT(test_samples,x)./(1+multi_r1_times_TT(test_samples,y));
+    % b_predict(:,i) = multi_r1_times_TT(test_samples,x)./Cy_r1(C_test,y);
     % b_predict(:,i) = multi_r1_times_TT(test_samples,x)./(1+C_test*y);
 end
 

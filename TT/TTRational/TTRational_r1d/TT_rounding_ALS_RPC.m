@@ -1,4 +1,4 @@
-function [x,y] = TT_rounding_ALS_RPC(A,x,b,Cb,y,r_max,lambda)
+function [x,y,Ax,Cy] = TT_rounding_ALS_RPC(A,x,b,Cb,y,r_max,lambda)
 %TT_ROUNDING_ALS Summary of this function goes here
 %   Detailed explanation goes here
 
