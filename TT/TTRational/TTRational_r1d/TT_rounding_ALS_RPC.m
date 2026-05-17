@@ -66,20 +66,14 @@ for i = 1:d-1
     xi = reshape(Jx_reg\b_reg,[r(i)*m(i) r(i+1)]);
 
 
-    [U,~,~] = svd(xi,"econ");
+    [U,S,V] = svd(xi,"econ");
     r(i+1) = min(r(i+1),r_max);
     x{i} = U(:,1:r(i+1));
 
     axl{i+1} = reshape(axl{i}.*permute(A{i},[1 3 2]),n_samples,[])*x{i};
 end
-i = d;
-ni = r(i)*m(i)*r(i+1);
-Jxi = (axl{i}./Cy ).*permute(A{i},[1 3 2]).*permute(axr{i},[1 3 4 2]);
-Jxi = reshape(Jxi,n_samples,ni);
-Jx_reg = [Jxi ;lambda*eye(ni)];
-b_reg = [b; zeros(ni,1)];
-x{d} = Jx_reg\b_reg;
+x{d} =  h2v(S(1:r(d),1:r(d))*V(:,1:r(d))'*v2h(x{d},m(d)),m(d));
 
-Ax = Jxi*x{d}.*Cy;
+Ax = reshape(axl{d}.*permute(A{d},[1 3 2]),n_samples,[])*x{d};
 Cy = Cy-1;
 end

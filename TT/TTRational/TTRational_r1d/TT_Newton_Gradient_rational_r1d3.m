@@ -2,16 +2,16 @@ function [V,dU,Adx,W,dY,Cdy] = TT_Newton_Gradient_rational_r1d3(A,C,U,Y,residual
 % To solve (Ax)./(1+Cy) = b, we find Ax ./ C.y = b. Each iteration we
 % update x and y by solving dx*df/dx + dy*df/dy = r
 
+[d,m,r] = TTsizes(U);
+[~,my,ry] = TTsizes(Y);
 
+%Least squares retraction for the last TT-core
 
 
 %Right Orthogonalize, find every non-orthogonal Ux to compute the search
 %directions dUx
 [Ux,V] = TTmuOrthogonalizeRL(U);
 [Yy,W] = TTmuOrthogonalizeRL(Y);
-
-[d,m,r] = TTsizes(U);
-[~,my,ry] = TTsizes(Y);
 
 
 [~,axl] = Ax_left(A,U,d);
@@ -32,7 +32,7 @@ Cy = sum((C{1}*Yy{1}).*cyr{1},2)+1;
 
 Jx = cell(d,1);
 Jy = cell(d,1);
-lambda2 = 0.1*lambda;
+lambda2 = 1*lambda;
 %solve the search directions
 for i = 1:d
     ni = r(i)*m(i)*r(i+1);
