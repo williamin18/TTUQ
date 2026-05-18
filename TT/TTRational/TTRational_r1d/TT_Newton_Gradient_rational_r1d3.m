@@ -1,11 +1,51 @@
-function [V,dU,Adx,W,dY,Cdy] = TT_Newton_Gradient_rational_r1d3(A,C,U,Y,residual,beta,dx_old,dy_old,lambda)
+function [V,dU,Adx,W,dY,Cdy] = TT_Newton_Gradient_rational_r1d3(A,C,U,Y,b,residual,beta,dx_old,dy_old,lambda)
 % To solve (Ax)./(1+Cy) = b, we find Ax ./ C.y = b. Each iteration we
 % update x and y by solving dx*df/dx + dy*df/dy = r
 
 [d,m,r] = TTsizes(U);
 [~,my,ry] = TTsizes(Y);
+[n_samples,~] = size(A{1});
 
-%Least squares retraction for the last TT-core
+%Output update directions
+dU = cell(d,1);
+dY = cell(d,1);
+
+%Store Jacobian for each update direction
+Jx = cell(d,1);
+Jy = cell(d,1);
+lambda2 = 1*lambda;
+
+%Left contraction
+[~,axl] = Ax_left(A,U,d);
+[~,cyl] = Ax_left(C,Y,d);
+
+%Least squares retraction for the last TT-core of denominator
+% Ad = reshape(axl{d}.*permute(A{d},[1 3 2]),n_samples,[]);
+% Cd = reshape(cyl{d}.*permute(C{d},[1 3 2]),n_samples,[]);
+% Ax = Ad*U{d};
+% Cy = Cd*Y{d}+1;
+% 
+% ni = ry(d)*my(d);
+% Jyd = (-Ax./Cy.^2).*Cd;
+% Jy_reg = [Jyd;lambda2*eye(ni)];
+% res_reg = [residual; -lambda2*reshape(Y{d},ni,1)];
+% dY{d} = Jy_reg\res_reg;
+% Y{d} = Y{d}+dY{d};
+% 
+% Cy = Cd*Y{d}+1;
+% residual = b-Ax./Cy;
+% 
+% %Least squares retraction for the last TT-core of numerator
+% ni = r(d)*m(d);
+% Jx{d} = Ad./Cy;
+% Jx_reg = [Jx{d};lambda*eye(ni)];
+% res_reg = [residual; -lambda*reshape(U{d},ni,1)];
+% dU{d} = Jx_reg\res_reg;
+% U{d} = U{d}+dU{d};
+% 
+% Ax = Ad*U{d};
+% residual = b-Ax./Cy;
+% Jy{d} = (-Ax./Cy.^2).*Cd;
 
 
 %Right Orthogonalize, find every non-orthogonal Ux to compute the search
@@ -13,26 +53,14 @@ function [V,dU,Adx,W,dY,Cdy] = TT_Newton_Gradient_rational_r1d3(A,C,U,Y,residual
 [Ux,V] = TTmuOrthogonalizeRL(U);
 [Yy,W] = TTmuOrthogonalizeRL(Y);
 
-
-[~,axl] = Ax_left(A,U,d);
 [~,axr] = Ax_right(A,V,1);
-[n_samples,~] = size(A{1});
-
-[~,cyl] = Ax_left(C,Y,d);
 [~,cyr] = Ax_right(C,W,1);
 
-
-dU = cell(d,1);
-dY = cell(d,1);
 
 Ax = sum((A{1}*Ux{1}).*axr{1},2);
 Cy = sum((C{1}*Yy{1}).*cyr{1},2)+1;
 
 
-
-Jx = cell(d,1);
-Jy = cell(d,1);
-lambda2 = 1*lambda;
 %solve the search directions
 for i = 1:d
     ni = r(i)*m(i)*r(i+1);
