@@ -1,4 +1,4 @@
-function [V,dU,Adx,W,dY,Cdy] = TT_Newton_Gradient_rational_r1d3(A,C,U,Y,b,residual,beta,dx_old,dy_old,lambda)
+function [U,V,dU,Adx,Y,W,dY,Cdy] = TT_Newton_Gradient_rational_r1d3(A,C,U,Y,b,residual,beta,dx_old,dy_old,lambda)
 % To solve (Ax)./(1+Cy) = b, we find Ax ./ C.y = b. Each iteration we
 % update x and y by solving dx*df/dx + dy*df/dy = r
 
@@ -19,7 +19,7 @@ lambda2 = 1*lambda;
 [~,axl] = Ax_left(A,U,d);
 [~,cyl] = Ax_left(C,Y,d);
 
-%Least squares retraction for the last TT-core of denominator
+% %Least squares retraction for the last TT-core of denominator
 % Ad = reshape(axl{d}.*permute(A{d},[1 3 2]),n_samples,[]);
 % Cd = reshape(cyl{d}.*permute(C{d},[1 3 2]),n_samples,[]);
 % Ax = Ad*U{d};
@@ -44,7 +44,8 @@ lambda2 = 1*lambda;
 % U{d} = U{d}+dU{d};
 % 
 % Ax = Ad*U{d};
-% residual = b-Ax./Cy;
+% residual = b - Ax./Cy;
+
 % Jy{d} = (-Ax./Cy.^2).*Cd;
 
 
@@ -80,6 +81,15 @@ for i = 1:d
     dYi = Jy_reg'*res_reg;
     dY{i} = reshape(dYi,[r(i)*m(i) r(i+1)]);
 end
+
+% i = d;
+% ni = ry(i)*my(i)*ry(i+1);
+% Jyi = (cyl{i}.*(-Ax./(Cy.^2)) ).*permute(C{i},[1 3 2]).*permute(cyr{i},[1 3 4 2]);
+% Jy{i} = reshape(Jyi,n_samples,ni);
+% Jy_reg = [Jy{i};lambda2*eye(ni)];
+% res_reg = [residual; -lambda2*reshape(Yy{i},ni,1)];
+% dYi = Jy_reg'*res_reg;
+% dY{i} = reshape(dYi,[r(i)*m(i) r(i+1)]);
 
 dfdx = zeros(n_samples,d);
 dfdy = zeros(n_samples,d);
