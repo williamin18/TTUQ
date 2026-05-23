@@ -7,6 +7,8 @@ break_counter = 0;
 break_limit = 5;
 err_old = 100;
 
+x = TTorthogonalizeRL(x);
+y = TTorthogonalizeRL(y);
 
 x = TTorthogonalizeLR(x);
 y = TTorthogonalizeLR(y);
@@ -61,7 +63,7 @@ for epoch = 1:max_iterations
     training_err = norm(r)/norm(b);
     test_err = norm(r_test)/norm(b_test);
 
-    % [ training_err test_err]
+    [ training_err test_err]
     if test_err < tol 
         break
     end

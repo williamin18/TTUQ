@@ -8,10 +8,8 @@ lambda1 = preprocessing_parameter;
 lambda2 = regularization_parameter;
 
 freq_order = 10;
-f_scale = 2/max(freq);
+f_scale = max(freq)/2;
 f_bias = -1;
-freq = reshape(f_scale*freq+f_bias,length(freq),1);
-
 
 
 [n_samples,d] = size(xi_train);
@@ -35,24 +33,24 @@ for i = 1:d
 end
 
 %init TT coefficients
-N = [(order+1)*ones(d,1); freq_order+1];
+N = [(order+1)*ones(d,1) freq_order+1];
 r1_init = cell(d+1,1);
 for i = 1:d
     r1_init{i} = zeros(order+1,1);
     r1_init{i}(1) = 1;
     r1_init{i}(2) = 0.1;
 end
-r1_init{d+1} = zeros(freq_order+1,1);
-r1_init{d+1}(1) = mean(b_train(1,:));
-r1_init{d+1}(2) = std(b_train(1,:));
+r1_init{d} = zeros(freq_order+1,1);
+r1_init{d}(1) = mean(b_train(1,:));
+r1_init{d}(2) = std(b_train(1,:));
 
 
 N_coefficients = TTaxby(1,r1_init,1,TTrand(N,r_max-1));
 D_coefficients = TTrand(N,r_max);
 
 [N_coefficients,D_coefficients,training_err,test_err,n_iterations] = TT_Newton_rational_r1d3(...
-    training_samples,N_coefficients,training_samples,D_coefficients,training_out,...
-    r_max,tol,max_iterations,vali_samples,vali_samples,vali_out,lambda2);
+    training_samples,N_coefficients,training_samples,D_coefficients,training_out(:,i),...
+    r_max,tol,max_iterations,vali_samples,vali_samples,vali_out(:,i),lambda2);
 
 
 [n_test_samples,~] = size(xi_test);

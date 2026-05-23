@@ -1,0 +1,11 @@
+function [Y,y_m] = genLegendreMatrix(xi,order)
+%GENLEGENDREMATRIX undefined
+%   undefined
+n = length(xi);
+xi = reshape(xi,n,1);
+Y = zeros(n,oredr);
+Y(:,1) 
+
+for i = 1:order
+end
+end

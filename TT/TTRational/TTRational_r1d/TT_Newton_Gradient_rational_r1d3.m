@@ -154,17 +154,18 @@ else
     Cdy = [dfdy dfdy2]*alpha(2*d+1:4*d).*(-Cy.^2./Ax);
 end
 
-Adx2 = zeros(n_samples);
-Cdy2 = zeros(n_samples);
-for i = 1:d
-    Jxi = axl{i}.*permute(A{i},[1 3 2]).*permute(axr{i},[1 3 4 2]);
-    Jxi = reshape(Jxi,n_samples,[]);
-    Adx2 = Adx2+Jxi*reshape(dU{i},[],1);
 
-    Jyi = cyl{i}.*permute(C{i},[1 3 2]).*permute(cyr{i},[1 3 4 2]);
-    Jyi = reshape(Jyi,n_samples,[]);
-    Cdy2 = Cdy2+Jyi*reshape(dY{i},[],1);
-end
+% Adx2 = zeros(n_samples);
+% Cdy2 = zeros(n_samples);
+% for i = 1:d
+%     Jxi = axl{i}.*permute(A{i},[1 3 2]).*permute(axr{i},[1 3 4 2]);
+%     Jxi = reshape(Jxi,n_samples,[]);
+%     Adx2 = Adx2+Jxi*reshape(dU{i},[],1);
+% 
+%     Jyi = cyl{i}.*permute(C{i},[1 3 2]).*permute(cyr{i},[1 3 4 2]);
+%     Jyi = reshape(Jyi,n_samples,[]);
+%     Cdy2 = Cdy2+Jyi*reshape(dY{i},[],1);
+% end
 
 
 

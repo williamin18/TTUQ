@@ -17,14 +17,19 @@ n_freq = length(freq);
 
 y = cell(d+1,1);
 for i = 1:d
-    y{i} = kron(ones(n_freq,1),f(samples(:,i),order));
+    y{i} = kron(ones(n_freq),f(samples(:,i),j));
+end
+for i = 1:d
+    for j = 0:order
+        y{i}(:,j+1) = kron(ones(n_freq),f(samples(:,i),j));
+    end
 end
 
 
 
-
-y{d+1}= kron(genLegendreMatrix(freq,f_order),ones(n,1));
-
+for j = 1:f_order
+    y{d+1}(:,j+1) = kron(genLegendre(freq,j),ones(n,1));
+end
 
 end
 
