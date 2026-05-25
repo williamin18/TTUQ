@@ -1,5 +1,5 @@
 function [b_predict,N_coefficients,D_coefficients,n_iterations] = ...
-    rpc_TT_freq(freq,xi_train,b_train,xi_test,order,polynomial,...
+    rpc_TT_freq(freq,xi_train,b_train,xi_test,order,freq_order,polynomial,...
     preprocessing_parameter,regularization_parameter,tol,training_proportion,r_max)
 
 max_iterations = 500;
@@ -7,7 +7,6 @@ max_iterations = 500;
 lambda1 = preprocessing_parameter;
 lambda2 = regularization_parameter;
 
-freq_order = 10;
 f_scale = 2/max(freq);
 f_bias = -1;
 freq = reshape(f_scale*freq+f_bias,length(freq),1);

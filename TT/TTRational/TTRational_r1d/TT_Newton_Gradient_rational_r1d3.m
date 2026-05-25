@@ -79,7 +79,7 @@ for i = 1:d
     Jy_reg = [Jy{i};lambda2*eye(ni)];
     res_reg = [residual; -lambda2*reshape(Yy{i},ni,1)];
     dYi = Jy_reg'*res_reg;
-    dY{i} = reshape(dYi,[r(i)*m(i) r(i+1)]);
+    dY{i} = reshape(dYi,[ry(i)*m(i) ry(i+1)]);
 end
 
 % i = d;
