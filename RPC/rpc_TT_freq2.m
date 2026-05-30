@@ -33,22 +33,28 @@ for i = 1:d-1
         test_samples{i}(:,j+1) = test_samples{i}(:,j+1)*lambda1^j;
     end
 end
+lambda3 = 1;
+for j = 1:freq_order
+    training_samples{d}(:,j+1) = training_samples{d}(:,j+1)*lambda3^j;
+    vali_samples{d}(:,j+1) = vali_samples{d}(:,j+1)*lambda3^j;
+    test_samples{d}(:,j+1) = test_samples{d}(:,j+1)*lambda3^j;
+end
 
 %init TT coefficients
 N = [(order+1)*ones(d-1,1); freq_order+1];
-% r1_init = cell(d,1);
-% for i = 1:d-1
-%     r1_init{i} = zeros(order+1,1);
-%     r1_init{i}(1) = 1;
-%     r1_init{i}(2) = 0.1;
-% end
-% r1_init{d} = zeros(freq_order+1,1);
-% r1_init{d}(1) = mean(b_train(1,:));
-% r1_init{d}(2) = std(b_train(1,:));
-% 
-% 
-% N_coefficients = TTaxby(1,r1_init,1,TTrand(N,r_max-1));
-N_coefficients = TTrand(N,r_max);
+r1_init = cell(d,1);
+for i = 1:d-1
+    r1_init{i} = zeros(order+1,1);
+    r1_init{i}(1) = 1;
+    r1_init{i}(2) = 0.1;
+end
+r1_init{d} = zeros(freq_order+1,1);
+r1_init{d}(1) = mean(b_train(1,:));
+r1_init{d}(2) = std(b_train(1,:));
+
+
+N_coefficients = TTaxby(1,r1_init,1,TTrand(N,r_max-1));
+% N_coefficients = TTrand(N,r_max);
 D_coefficients = TTrand(N,r_max);
 
 [N_coefficients,D_coefficients,training_err,test_err,n_iterations] = TT_Newton_rational_r1d3(...

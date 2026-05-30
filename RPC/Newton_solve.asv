@@ -1,0 +1,46 @@
+function [a_n,a_d,n_iterations,rel_err] = Newton_solve(Phi,y,a_n,a_d,tol,max_iterations,regularizaion_parameter)
+
+rel_err = 1;
+break_counter = 0;
+break_limit = 5;
+
+[n_samples,n_n] = size(Phi);
+lambda = regularizaion_parameter;
+
+Phi_n = Phi*a_n;
+Phi_d = Phi*a_d;
+r = Phi_n./Phi_d-y;
+for i = 1:max_iterations
+    
+    Jn = Phi./Phi_d;
+    Jd = -Phi_n./(Phi_d.^2).*Phi;
+    dx = [Jn Jd; lambda*eye(n_n*2)]\[r;lambda*a_n;lambda*a_d];
+    
+    a_n = a_n + x(1:n_n,:);
+    a_d = a_d + x(n_n+1:end,:);
+    
+    Phi_n = Phi*a_n;
+    Phi_d = Phi*a_d;
+    r = Phi_n./Phi_d-y;
+
+    rel_err = norm((Phi*a_n)./(Phi*a_d)-y)/norm(y);
+    
+    
+    if rel_err<tol 
+        break
+    end
+
+    if  rel_err_old-rel_err < tol/10
+        break_counter = break_counter+1;
+        if break_counter >break_limit
+            break
+        end
+    else
+        break_counter = 0;
+    end
+
+end
+n_iterations = i;
+
+end
+
