@@ -2,7 +2,7 @@ function [b_predict,N_coefficients,D_coefficients,n_iterations] = ...
     rpc_TT_freq(freq,xi_train,b_train,xi_test,order,freq_order,polynomial,...
     preprocessing_parameter,regularization_parameter,tol,training_proportion,r_max)
 
-max_iterations = 500;
+max_iterations = 20;
 
 lambda1 = preprocessing_parameter;
 lambda2 = regularization_parameter;
@@ -51,7 +51,7 @@ D_coefficients = TTrand(N,r_max);
 
 [N_coefficients,D_coefficients,training_err,test_err,n_iterations] = TT_Newton_rational_r1d3(...
     training_samples,N_coefficients,training_samples,D_coefficients,training_out,...
-    r_max,tol,max_iterations,vali_samples,vali_samples,vali_out,lambda2);
+    r_max,tol,max_iterations,vali_samples,vali_samples,vali_out,lambda2,30000);
 
 
 [n_test_samples,~] = size(xi_test);

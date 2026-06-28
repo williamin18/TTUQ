@@ -69,7 +69,8 @@ for i = 1:d
     Jx{i} = reshape(Jxi,n_samples,ni);
     Jx_reg = [Jx{i} ;lambda*eye(ni)];
     res_reg = [residual; -lambda*reshape(Ux{i},ni,1)];
-    dUi = Jx_reg\res_reg;
+    dUi = Jx_reg'*res_reg;
+    % dUi = Jx_reg\res_reg;
     dU{i} = reshape(dUi,[r(i)*m(i) r(i+1)]);
 
 
@@ -78,7 +79,8 @@ for i = 1:d
     Jy{i} = reshape(Jyi,n_samples,ni);
     Jy_reg = [Jy{i};lambda2*eye(ni)];
     res_reg = [residual; -lambda2*reshape(Yy{i},ni,1)];
-    dYi = Jy_reg\res_reg;
+    dYi = Jy_reg'*res_reg;
+    % dYi = Jy_reg\res_reg;
     dY{i} = reshape(dYi,[ry(i)*m(i) ry(i+1)]);
 end
 
@@ -98,6 +100,7 @@ for i = 1:d
     dfdy(:,i) = Jy{i}*reshape(dY{i},[],1);
 end
 
+lambda3 = 1e-3;
 if beta <= 0
     %no momentum
     Ja = [dfdx dfdy];
@@ -110,7 +113,9 @@ if beta <= 0
     end
 
     %solve step sizes, update search directions
-    alpha = (Ja'*Ja+reg_matrix)\(Ja'*residual+reg_vec);
+    % alpha = [(Ja'*Ja+reg_matrix);lambda3^2*eye(d*2)]\[(Ja'*residual+reg_vec);zeros(d*2,1)];
+    alpha = ((Ja'*Ja+reg_matrix))\((Ja'*residual+reg_vec));
+
     for i = 1:d
         dU{i} = alpha(i)*dU{i};
         dY{i} = alpha(d+i)*dY{i};
@@ -144,7 +149,9 @@ else
         reg_vec(3*d+i) = -lambda2^2*sum(conj(dY_old{i}).* Yy{i},"all");
     end
     %solve step sizes, update search directions
-    alpha = (Ja'*Ja+reg_matrix)\(Ja'*residual+reg_vec);
+    % alpha = [(Ja'*Ja+reg_matrix); lambda3^2*eye(4*d)]\[(Ja'*residual+reg_vec);zeros(4*d,1)];
+    alpha = ((Ja'*Ja+reg_matrix))\((Ja'*residual+reg_vec));
+
     for i = 1:d
         dU{i} = alpha(i)*dU{i}+alpha(d+i)*dU_old{i};
         dY{i} = alpha(2*d+i)*dY{i}+alpha(3*d+i)*dY_old{i};

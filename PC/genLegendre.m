@@ -15,6 +15,10 @@ switch order
         y = 1/8*(63*xi.^5 - 70*xi.^3 + 15*xi);
     case 6
         y = 1/16*(231*xi^6-315*xi^4+105*xi^2-5);
+    case 7 
+        y = 1/16*(429*xi^7-693*xi^5+315*xi^3-35*xi);
+    case 8
+        y = 1/128*(6435*xi^8 - 12012*xi^6 + 6930*xi^4 - 1260*xi^2 + 35);
     otherwise
         err('Unsupported order')
 

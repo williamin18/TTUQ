@@ -2,7 +2,7 @@ function [b_predict,N_coefficients,D_coefficients,n_iterations] = ...
     rpc_TT(xi_train,b_train,x,xi_test,order,polynomial,...
     preprocessing_parameter,regularization_parameter,tol,training_proportion,r_max)
 
-max_iterations = 300;
+max_iterations = 100;
 
 lambda1 = preprocessing_parameter;
 lambda2 = regularization_parameter;
