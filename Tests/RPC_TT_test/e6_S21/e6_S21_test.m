@@ -1,15 +1,28 @@
 clear variables
 close all
 
-load('Tests\RPC_TT_test\e6_S21\S21_2par.mat');
+load('Tests\RPC_TT_test\e6_S21\S21_5d.mat');
 
-S21_train = permute(S21_full,[2 3 1]);
-S21_train = reshape(S21_train,49,[]);
+N = 7^4;
+S21 = permute(S21_full,[2 3 4 5 1]);
+S21 = reshape(S21,N,[]);
+% S21 = S21.*(1+1e-4*(rand(N,1)-0.5));
 xi_1 = linspace(-1,1,7)';
-[i1,i2] = ind2sub([7 7], (1:49)');
-xi_train = [xi_1(i1) xi_1(i2)];
+[i1,i2,i3,i4] = ind2sub([7 7 7 7], (1:N)');
+xi = [xi_1(i1) xi_1(i2) xi_1(i3) xi_1(i4)];
+shuffle = randperm(N);
+xi = xi(shuffle,:);
+S21 = S21(shuffle,:);
 
-S21_predict = pc_collocation_total(xi_train,S21_train,xi_test,6 ,'Legendre');
+trainCount = round(0.2*N);
+xi_train = xi(1:trainCount,:);
+xi_test = xi(trainCount+1:end,:);
+S21_train = S21(1:trainCount,:);
+S21_test = S21(trainCount+1:end,:);
+
+
+% S21_predict = pc_collocation_total(xi_train,S21_train,xi_test,8 ,'Legendre');
+S21_predict = rpc_total(xi_train,S21_train,xi_test,5,'Legendre',0.5,1e-4,5e-3);
 norm(S21_predict-S21_test,'fro')/norm(S21_test,'fro')
 
 % S21_predict = pc_collocation_total(xi_train,S21_train,[-1,-1],4 ,'Legendre');

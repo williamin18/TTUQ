@@ -24,7 +24,7 @@ dUx = cell(d,1);
 for i = 1:d
     for j = 1:m(i)
         temp = residual.*A{i}(:,j);
-        temp = yr{i}.*repelem(temp,1,r(i+1));
+        temp = conj(yr{i}.*repelem(temp,1,r(i+1)));
         dUx{i}((j-1)*r(i)+1:j*r(i),:) = (yl{i}'*temp);
     end
      
